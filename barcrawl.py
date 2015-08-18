@@ -10,6 +10,7 @@ import argparse
 import json
 import pprint
 import sys
+import time
 import urllib
 import urllib2
 import oauth2
@@ -209,9 +210,9 @@ for i in range(0, len(locations)):
            pairs[j][i] = 1
 
            # Send request to Google Maps
+           time.sleep(0.5)
            resp = requests.get(url=url, params=params)
            data = json.loads(resp.text)
-           #pprint.pprint(data)
            print('\nFROM: ' + prettyLocations[i] + "\nTO: "+ prettyLocations[j] + '\nDistance: ' +
                  data.get('routes')[0].get('legs')[0].get('distance').get('text'))
            print('Time: ' +
