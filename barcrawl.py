@@ -1,6 +1,6 @@
 # CS4800 - Mini Pacman Bar Hopping
 # Input:   Cities to visit
-# Output:  Route to the highest rated restaurant in each city
+# Output:  Route to the highest rated bar in each city
 
 #import numpy as np # setup later
 import json, requests # for making request to Google Maps
@@ -27,6 +27,14 @@ CONSUMER_KEY = 'MapfPwZlG1iuz9Acja1hUA'
 CONSUMER_SECRET = 'ab5uLcItYvNO4FraBskwug5FKoc'
 TOKEN = 'dli5QisyRwIiG05K4R34VRO3HhpUEYeU'
 TOKEN_SECRET = 'Z949X5mUkHw_eSTQA_nxFft0UJ4'
+
+#Get input as string
+def get_input(prompt):
+    #Python2
+    if (sys.version_info[0] < 3):
+        return raw_input(prompt)
+    else:
+        return input(prompt)
 
 def request(host, path, url_params=None):
    """Prepares OAuth authentication and sends the request to the API.
@@ -79,7 +87,8 @@ def search(term, location):
    url_params = {
        'term': term.replace(' ', '+'),
        'location': location.replace(' ', '+'),
-       'limit': SEARCH_LIMIT
+       'limit': SEARCH_LIMIT,
+       'category_filter': DEFAULT_TERM
    }
    return request(API_HOST, SEARCH_PATH, url_params=url_params)
 
@@ -110,16 +119,7 @@ def query_api(term, location):
 
    business_id = businesses[0]['id']
 
-   # Print out info for top place
-   # print u'{0} businesses found, querying business info for the top result "{1}" ...'.format(
-   #     len(businesses),
-   #     business_id
-   # )
-
    response = get_business(business_id)
-
-   #print u'Result for business "{0}" found:'.format(business_id)
-   # pprint.pprint(response, indent=2)
    return response
 
 # def main():
@@ -148,27 +148,27 @@ locations = []
 # Printable Addresses
 prettyLocations = []
 # Get starting address
-origin = input('Enter starting address (Ex: \'300 Huntington Avenue, Boston\'):  ')
+origin = get_input('Enter starting address (Ex: \'300 Huntington Avenue, Boston\'):  ')
 locations.append(origin)
 prettyLocations.append(origin)
 # Get cities
-cities = input('Enter cities (Ex: \'Boston,Cambridge\'):  ').split(',')
+cities = get_input('Enter cities (Ex: \'Boston,Cambridge\'):  ').split(',')
 
 print('-' * 50)
-print('Getting restaurants...')
+print('Getting bars...')
 # Get list of top restaurants in each city
 for city in cities:
    try:
        print('')
        response = query_api(DEFAULT_TERM, city)
-       #pprint.pprint(response.get('location'))
+       #pprint.pprint(response)
        locations.append(str(response.get('location').get('coordinate').get('latitude')) + ',' +
                         str(response.get('location').get('coordinate').get('longitude')))
        # change to use coordinates to be more accurate
        # Print out restaurant name and address
        prettyName = ""
        print(city + ':')
-       print(response.get('name'))
+       print(response.get('name') + ": " + str(response.get('rating')))
        if len(response.get('location').get('display_address')) > 0:
            prettyName += response.get('location').get('display_address')[0]
            print(response.get('location').get('display_address')[0])
@@ -213,10 +213,8 @@ for i in range(0, len(locations)):
            time.sleep(0.5)
            resp = requests.get(url=url, params=params)
            data = json.loads(resp.text)
-           print('\nFROM: ' + prettyLocations[i] + "\nTO: "+ prettyLocations[j] + '\nDistance: ' +
-                 data.get('routes')[0].get('legs')[0].get('distance').get('text'))
-           print('Time: ' +
-                 data.get('routes')[0].get('legs')[0].get('duration').get('text'))
+           print('\nFROM: ' + prettyLocations[i] + "\nTO: "+ prettyLocations[j] + '\nDistance: ' + data.get('routes')[0].get('legs')[0].get('distance').get('text'))
+           print('Time: ' + data.get('routes')[0].get('legs')[0].get('duration').get('text'))
 
 print('-' * 50)
 # ------
