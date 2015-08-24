@@ -1,6 +1,17 @@
-#Barcrawl
+# Barcrawl
 
 CS4800 Algorithms final project to provide an optimal bar crawl path from city to city. The objective is to implement a Traveling Salesman Problem approximation algorithm.
+
+## Technologies
+- Python 2
+- Google Maps Geocode API
+- Google Maps Directions API
+- Yelp Business API
+- Yelp Search API
+
+## Running the Program
+In terminal/command console:
+`python barcrawl.py`
 
 ## Process
 1. The user inputs the origin city
