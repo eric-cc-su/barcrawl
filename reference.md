@@ -13,26 +13,6 @@ This is the list of user-friendly locations. Each item is a string.
       'Bar Name, Street Address, City, ZIP',
       'Bar Name, Street Address, City, ZIP',...
     ]
-### pairings
-This is the dictionary of data on city-to-city distance and route duration.
-
-    pairings = {
-      '0-1': {
-        'distance': meters,
-        'duration': seconds
-      },
-      '0-2': {
-        'distance': meters,
-        'duration': seconds
-      },
-      ...
-    }
-
-## Possible Bar Ranking
-Based on:
-- distance
-- rating
-- review_count
 
 ## Sample Yelp response
 

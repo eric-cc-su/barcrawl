@@ -30,7 +30,7 @@ print('Getting bars...')
 for city in cities:
    try:
        print('')
-       response = yelp.query_api('bars', city)
+       response = yelp.query_api(DEFAULT_TERM, city)
        #pprint.pprint(response)
        locations.append(str(response.get('location').get('coordinate').get('latitude')) + ',' +
                         str(response.get('location').get('coordinate').get('longitude')))
@@ -61,6 +61,7 @@ print('Getting distances...')
 # Generate list of locations to visit in order
 url = 'http://maps.googleapis.com/maps/api/directions/json'
 
+# NEED TO FIX - need to skip over duplicate i,j pairs to reduce requests
 # Create 2D array to keep track of pairs of locations - USE NUMPY LATER
 pairs = [[0]*len(locations) for x in xrange(len(locations))]
 distances_matrix = [[0]*len(locations) for x in xrange(len(locations))]
