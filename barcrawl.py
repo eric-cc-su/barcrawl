@@ -27,6 +27,7 @@ CONSUMER_KEY = 'MapfPwZlG1iuz9Acja1hUA'
 CONSUMER_SECRET = 'ab5uLcItYvNO4FraBskwug5FKoc'
 TOKEN = 'dli5QisyRwIiG05K4R34VRO3HhpUEYeU'
 TOKEN_SECRET = 'Z949X5mUkHw_eSTQA_nxFft0UJ4'
+GEOCODE_TOKEN = 'AIzaSyBHdKwpv-g9Zlbgi61PO1IcvU_3VIcKwPI'
 
 #Get input as string
 def get_input(prompt):
@@ -122,20 +123,17 @@ def query_api(term, location):
    response = get_business(business_id)
    return response
 
-# def main():
-#     parser = argparse.ArgumentParser()
-#
-#     # Arguments (key term & location)
-#     parser.add_argument('-q', '--term', dest='term', default=DEFAULT_TERM, type=str, help='Search term (default: %(default)s)')
-#     parser.add_argument('-l', '--location', dest='location', default=DEFAULT_LOCATION, type=str, help='Search location (default: %(default)s)')
-#
-#     input_values = parser.parse_args()
-#
-#     # Make request w/ arguments
-#     try:
-#         query_api(input_values.term, input_values.location)
-#     except urllib2.HTTPError as error:
-#         sys.exit('Encountered HTTP error {0}. Abort program.'.format(error.code))
+#Get the coordinates of the origin
+def get_origin(oAddress):
+    url='https://maps.googleapis.com/maps/api/geocode/json'
+    params = dict(address=oAddress)
+
+    # Send request to Google Maps
+    resp = requests.get(url=url, params=params)
+    data = resp.json()
+    lat = data['results'][0]['geometry']['location']['lat']
+    lng = data['results'][0]['geometry']['location']['lng']
+    return('{},{}'.format(str(lat),str(lng)))
 
 # -- END OF YELP
 
@@ -143,13 +141,15 @@ def query_api(term, location):
 # STEP 1 - Get top restaurants
 # ------
 
-# Addresses (origin and restaurants)
+# coordinates of locations
 locations = []
-# Printable Addresses
+# User-friendly Addresses
 prettyLocations = []
-# Get starting address
+
+# Get origin address
 origin = get_input('Enter starting address (Ex: \'300 Huntington Avenue, Boston\'):  ')
-locations.append(origin)
+originCoordinates = get_origin(origin)
+locations.append(originCoordinates)
 prettyLocations.append(origin)
 # Get cities
 cities = get_input('Enter cities (Ex: \'Boston,Cambridge\'):  ').split(',')
@@ -194,6 +194,7 @@ url = 'http://maps.googleapis.com/maps/api/directions/json'
 # NEED TO FIX - need to skip over duplicate i,j pairs to reduce requests
 # Create 2D array to keep track of pairs of locations - USE NUMPY LATER
 pairs = [[0]*len(locations) for x in xrange(len(locations))]
+pairings = {}
 
 for i in range(0, len(locations)):
    for j in range(0, len(locations)):
@@ -213,6 +214,11 @@ for i in range(0, len(locations)):
            time.sleep(0.5)
            resp = requests.get(url=url, params=params)
            data = json.loads(resp.text)
+           #stores A-to-B duration (seconds) and distance (meters) data
+           pairings['{}-{}'.format(i,j)] = {
+           "distance": data.get('routes')[0].get('legs')[0].get('distance').get('value'),
+           "duration": data.get('routes')[0].get('legs')[0].get('duration').get('value')
+           }
            print('\nFROM: ' + prettyLocations[i] + "\nTO: "+ prettyLocations[j] + '\nDistance: ' + data.get('routes')[0].get('legs')[0].get('distance').get('text'))
            print('Time: ' + data.get('routes')[0].get('legs')[0].get('duration').get('text'))
 
