@@ -120,7 +120,7 @@ def create_path(connections):
         prev_city, cur_city = cur_city, next_city
 
     # Append start to cycle back
-    path.append(start)
+    #path.append(start)
 
     return path
 
@@ -133,8 +133,8 @@ def create_path(connections):
 # Returns list of cities in order of approximated shortest route
 # -----------------------------------------------------------------------------
 def solve_tsp(distances, opt_steps):
-    print('Distances: ')
-    print(distances)
+    #print('Distances: ')
+    #print(distances)
 
     # Get number of cities
     num_cities = len(distances)
@@ -198,7 +198,7 @@ def solve_tsp(distances, opt_steps):
     # Get cities to traverse in order
     route = create_path(connections)
 
-    print('Route: ')
-    print (route)
+    #print('Route: ')
+    #print (route)
 
     return route
