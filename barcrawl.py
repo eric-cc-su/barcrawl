@@ -7,6 +7,18 @@ import urllib2, sys, time
 import yelp
 import tsp_solver
 
+#Get the coordinates of the origin
+def get_origin(oAddress):
+    url='https://maps.googleapis.com/maps/api/geocode/json'
+    params = dict(address=oAddress)
+
+    # Send request to Google Maps
+    resp = requests.get(url=url, params=params)
+    data = resp.json()
+    lat = data['results'][0]['geometry']['location']['lat']
+    lng = data['results'][0]['geometry']['location']['lng']
+    return('{},{}'.format(str(lat),str(lng)))
+
 # ------
 # STEP 1 - Get top restaurants
 # ------
