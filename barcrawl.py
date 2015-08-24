@@ -29,12 +29,12 @@ locations = []
 prettyLocations = []
 
 # Get origin address
-origin = get_input('Enter starting address (Ex: \'300 Huntington Avenue, Boston\'):  ')
+origin = raw_input('Enter starting address (Ex: \'300 Huntington Avenue, Boston\'):  ')
 originCoordinates = get_origin(origin)
 locations.append(originCoordinates)
 prettyLocations.append(origin)
 # Get cities
-cities = get_input('Enter cities (Ex: \'Boston,Cambridge\'):  ').split(',')
+cities = raw_input('Enter cities (Ex: \'Boston,Cambridge\'):  ').split(',')
 
 print('-' * 50)
 print('Getting bars...')
@@ -115,7 +115,7 @@ print('-' * 50)
 # STEP 3 - Algorithm to find shortest path
 # ------
 print('Calculating shortest route...')
-cities_index = solve_tsp(distances_matrix, 3)
+cities_index = tsp_solver.solve_tsp(distances_matrix, 3)
 
 for city in cities_index:
     print(prettyLocations[city])
