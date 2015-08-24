@@ -34,7 +34,7 @@ originCoordinates = get_origin(origin)
 locations.append(originCoordinates)
 prettyLocations.append(origin)
 # Get cities
-cities = raw_input('Enter cities (Ex: Boston,Cambridge,LA,Philadelphia'):  ').split(',')
+cities = raw_input('Enter cities (Ex: Boston,Cambridge,LA,Philadelphia):  ').split(',')
 
 print('-' * 50)
 print('Getting bars...')
@@ -119,9 +119,7 @@ cities_index = tsp_solver.solve_tsp(distances_matrix, 3)
 
 # Start and end cycle at start location
 print('\nRoute:')
-for city in cities_index[cities_index.index(0):]:
-    print(prettyLocations[city])
-for city in cities_index[:cities_index.index(0)]:
+for city in cities_index:
     print(prettyLocations[city])
 print(prettyLocations[0])
 

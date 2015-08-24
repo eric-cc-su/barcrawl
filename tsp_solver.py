@@ -198,7 +198,4 @@ def solve_tsp(distances, opt_steps):
     # Get cities to traverse in order
     route = create_path(connections)
 
-    #print('Route: ')
-    #print (route)
-
-    return route
+    return(route[route.index(0):]+route[:route.index(0)])
