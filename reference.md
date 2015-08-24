@@ -1,15 +1,3 @@
-## Process
-1. The user inputs the origin city
-2. The origin city coordinates are looked up via Google Geocode API and saved in a list (AKA `locations`)
-3. The user inputs a list of cities to visit (AKA `cities`)
-4. For every city in `cities` the Yelp API is called to find the top bar in each city
-5. Pairs are generated in numerical order and Google Directions API is used to find the distance and route duration between cities. Direction is not taken into account, therefore 0 -> 1 and 1 -> 0 will only be queried once.
-6. Each pair is saved in a dictionary (AKA `pairings`) in the format:
-
-    `{'0-1': {'distance': int (meters), 'duration': int (seconds)}}`
-
-7. Optimal path algorithm is implemented
-
 ## Data Structures
 ### locations
 This is the list of location coordinates. Each coordinate is a string.
@@ -25,6 +13,20 @@ This is the list of user-friendly locations. Each item is a string.
       'Bar Name, Street Address, City, ZIP',
       'Bar Name, Street Address, City, ZIP',...
     ]
+### pairings
+This is the dictionary of data on city-to-city distance and route duration.
+
+    pairings = {
+      '0-1': {
+        'distance': meters,
+        'duration': seconds
+      },
+      '0-2': {
+        'distance': meters,
+        'duration': seconds
+      },
+      ...
+    }
 
 ## Possible Bar Ranking
 Based on:
