@@ -29,12 +29,12 @@ locations = []
 prettyLocations = []
 
 # Get origin address
-origin = raw_input('Enter starting address (Ex: \'300 Huntington Avenue, Boston\'):  ')
+origin = raw_input('Enter starting address (Ex: 300 Huntington Avenue, Boston):  ')
 originCoordinates = get_origin(origin)
 locations.append(originCoordinates)
 prettyLocations.append(origin)
 # Get cities
-cities = raw_input('Enter cities (Ex: \'Boston,Cambridge\'):  ').split(',')
+cities = raw_input('Enter cities (Ex: Boston,Cambridge,LA,Philadelphia'):  ').split(',')
 
 print('-' * 50)
 print('Getting bars...')
