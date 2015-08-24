@@ -42,7 +42,7 @@ print('Getting bars...')
 for city in cities:
    try:
        print('')
-       response = yelp.query_api(DEFAULT_TERM, city)
+       response = yelp.query_api('bars', city)
        #pprint.pprint(response)
        locations.append(str(response.get('location').get('coordinate').get('latitude')) + ',' +
                         str(response.get('location').get('coordinate').get('longitude')))
@@ -97,11 +97,11 @@ for i in range(0, len(locations)):
            time.sleep(0.5)
            resp = requests.get(url=url, params=params)
            data = json.loads(resp.text)
-           
+
            # Storing distances in matrix for tsp_solver
            distances_matrix[i][j] = data.get('routes')[0].get('legs')[0].get('distance').get('value')
            distances_matrix[j][i] = data.get('routes')[0].get('legs')[0].get('distance').get('value')
-           
+
            #stores A-to-B duration (seconds) and distance (meters) data
            pairings['{}-{}'.format(i,j)] = {
            "distance": data.get('routes')[0].get('legs')[0].get('distance').get('value'),
