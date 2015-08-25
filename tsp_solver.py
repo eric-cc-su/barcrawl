@@ -133,9 +133,6 @@ def create_path(connections):
 # Returns list of cities in order of approximated shortest route
 # -----------------------------------------------------------------------------
 def solve_tsp(distances, opt_steps):
-    #print('Distances: ')
-    #print(distances)
-
     # Get number of cities
     num_cities = len(distances)
     if num_cities == 0: return []

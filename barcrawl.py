@@ -32,7 +32,7 @@ prettyLocations = []
 origin = raw_input('Enter starting address (Ex: 300 Huntington Avenue, Boston):  ')
 originCoordinates = get_origin(origin)
 locations.append(originCoordinates)
-prettyLocations.append(origin)
+prettyLocations.append(['origin',origin])
 # Get cities
 cities = raw_input('Enter cities (Ex: Boston,Cambridge,LA,Philadelphia):  ').split(',')
 
@@ -50,7 +50,7 @@ for city in cities:
        # Print out restaurant name and address
        prettyName = ""
        print(city + ':')
-       print(response.get('name') + ": " + str(response.get('rating')))
+       print(response.get('name'))
        if len(response.get('location').get('display_address')) > 0:
            prettyName += response.get('location').get('display_address')[0]
            print(response.get('location').get('display_address')[0])
@@ -60,7 +60,7 @@ for city in cities:
        if len(response.get('location').get('display_address')) > 2:
            prettyName += ", "+response.get('location').get('display_address')[2]
            print(response.get('location').get('display_address')[2])
-       prettyLocations.append(prettyName)
+       prettyLocations.append([response.get('name'),prettyName])
    except urllib2.HTTPError as error:
        sys.exit('Encountered HTTP error {0}. Abort program.'.format(error.code))
 
@@ -76,7 +76,6 @@ url = 'http://maps.googleapis.com/maps/api/directions/json'
 # Create 2D array to keep track of pairs of locations - USE NUMPY LATER
 pairs = [[0]*len(locations) for x in xrange(len(locations))]
 distances_matrix = [[0]*len(locations) for x in xrange(len(locations))]
-pairings = {}
 
 for i in range(0, len(locations)):
    for j in range(0, len(locations)):
@@ -101,12 +100,7 @@ for i in range(0, len(locations)):
            distances_matrix[i][j] = data.get('routes')[0].get('legs')[0].get('distance').get('value')
            distances_matrix[j][i] = data.get('routes')[0].get('legs')[0].get('distance').get('value')
 
-           #stores A-to-B duration (seconds) and distance (meters) data
-           pairings['{}-{}'.format(i,j)] = {
-           "distance": data.get('routes')[0].get('legs')[0].get('distance').get('value'),
-           "duration": data.get('routes')[0].get('legs')[0].get('duration').get('value')
-           }
-           print('\nFROM: ' + prettyLocations[i] + "\nTO: "+ prettyLocations[j] + '\nDistance: ' + data.get('routes')[0].get('legs')[0].get('distance').get('text'))
+           print('\nFROM: ' + prettyLocations[i][1] + "\nTO: "+ prettyLocations[j][1] + '\nDistance: ' + data.get('routes')[0].get('legs')[0].get('distance').get('text'))
            print('Time: ' + data.get('routes')[0].get('legs')[0].get('duration').get('text'))
 
 print('-' * 50)
@@ -116,11 +110,19 @@ print('-' * 50)
 print('Calculating shortest route...')
 # Returns route cycle
 cities_index = tsp_solver.solve_tsp(distances_matrix, 3)
+#print(distances_matrix)
+#print(prettyLocations)
 
 # Start and end cycle at start location
 print('\nRoute:')
-for city in cities_index:
-    print(prettyLocations[city])
-print(prettyLocations[0])
+route_distance = 0
+previous = 0
+for index, city in enumerate(cities_index):
+    route_distance += distances_matrix[previous][city]
+    print("%d miles driven - %s\n%s\n" % (int(route_distance*0.00062137), prettyLocations[city][0], prettyLocations[city][1]))
+    previous = city
+route_distance += distances_matrix[cities_index[-1]][0]
+print("%d miles driven - %s\n%s\n" % (int(route_distance*0.00062137), prettyLocations[0][0], prettyLocations[0][1]))
+print("Total Distance Travelled: %d miles" % int(route_distance*0.00062137))
 
 print('\nDone!')
