@@ -83,14 +83,14 @@ This is the list of user-friendly locations. Each item is a string.
     u'snippet_image_url': u'http://s3-media2.fl.yelpcdn.com/photo/8WDU8alAx7gPz0k7VZV--Q/ms.jpg',
     u'snippet_text': u"You honestly can't go wrong with $2 PBRs and $6 shots. I can't say I remember much of my experience here, but goddamn did they have amazing onion rings. The...",
     u'url': u'http://www.yelp.com/biz/biddy-earlys-boston'}
-    
+
 ## Sample Bar Crawl Response
 
-    Enter starting address (Ex: 300 Huntington Avenue, Boston):  300 Huntington Avenue, Boston
-    Enter cities (Ex: Boston,Cambridge,LA,Philadelphia):  Boston,Cambridge,LA,Philadelphia
+    Enter starting address (Ex: 300 Huntington Avenue, Boston):  300 Huntington Ave, Boston
+    Enter cities (Ex: Boston,Cambridge,LA,Philadelphia):  Boston,Cambridge,Philadelphia
     --------------------------------------------------
-    Getting restaurants...
-    
+    Getting bars...
+
     Querying http://api.yelp.com/v2/search/? ...
     Querying business info for the top result "biddy-earlys-boston" ...
     Querying http://api.yelp.com/v2/business/biddy-earlys-boston? ...
@@ -100,7 +100,7 @@ This is the list of user-friendly locations. Each item is a string.
     141 Pearl St
     Financial District
     Boston, MA 02110
-    
+
     Querying http://api.yelp.com/v2/search/? ...
     Querying business info for the top result "the-druid-cambridge" ...
     Querying http://api.yelp.com/v2/business/the-druid-cambridge? ...
@@ -110,17 +110,7 @@ This is the list of user-friendly locations. Each item is a string.
     1357 Cambridge St
     Inman Square
     Cambridge, MA 02139
-    
-    Querying http://api.yelp.com/v2/search/? ...
-    Querying business info for the top result "la-chuperia-los-angeles" ...
-    Querying http://api.yelp.com/v2/business/la-chuperia-los-angeles? ...
-    Result for business "la-chuperia-los-angeles" found:
-    LA:
-    La Chuperia
-    1145 N Mission Rd
-    Lincoln Heights
-    Los Angeles, CA 90033
-    
+
     Querying http://api.yelp.com/v2/search/? ...
     Querying business info for the top result "franky-bradleys-philadelphia" ...
     Querying http://api.yelp.com/v2/business/franky-bradleys-philadelphia? ...
@@ -132,65 +122,56 @@ This is the list of user-friendly locations. Each item is a string.
     Philadelphia, PA 19107
     --------------------------------------------------
     Getting distances...
-    
-    FROM: 300 Huntington Avenue, Boston
+
+    FROM: 300 Huntington Ave, Boston
     TO: 141 Pearl St, Financial District, Boston, MA 02110
     Distance: 2.2 mi
     Time: 16 mins
-    
-    FROM: 300 Huntington Avenue, Boston
+
+    FROM: 300 Huntington Ave, Boston
     TO: 1357 Cambridge St, Inman Square, Cambridge, MA 02139
     Distance: 2.7 mi
     Time: 17 mins
-    
-    FROM: 300 Huntington Avenue, Boston
-    TO: 1145 N Mission Rd, Lincoln Heights, Los Angeles, CA 90033
-    Distance: 2,981 mi
-    Time: 1 day 19 hours
-    
-    FROM: 300 Huntington Avenue, Boston
+
+    FROM: 300 Huntington Ave, Boston
     TO: 1320 Chancellor St, Washington Square West, Philadelphia, PA 19107
     Distance: 308 mi
     Time: 5 hours 12 mins
-    
+
     FROM: 141 Pearl St, Financial District, Boston, MA 02110
     TO: 1357 Cambridge St, Inman Square, Cambridge, MA 02139
     Distance: 4.4 mi
     Time: 15 mins
-    
-    FROM: 141 Pearl St, Financial District, Boston, MA 02110
-    TO: 1145 N Mission Rd, Lincoln Heights, Los Angeles, CA 90033
-    Distance: 2,982 mi
-    Time: 1 day 19 hours
-    
+
     FROM: 141 Pearl St, Financial District, Boston, MA 02110
     TO: 1320 Chancellor St, Washington Square West, Philadelphia, PA 19107
     Distance: 309 mi
     Time: 5 hours 11 mins
-    
-    FROM: 1357 Cambridge St, Inman Square, Cambridge, MA 02139
-    TO: 1145 N Mission Rd, Lincoln Heights, Los Angeles, CA 90033
-    Distance: 2,980 mi
-    Time: 1 day 19 hours
-    
+
     FROM: 1357 Cambridge St, Inman Square, Cambridge, MA 02139
     TO: 1320 Chancellor St, Washington Square West, Philadelphia, PA 19107
     Distance: 307 mi
     Time: 5 hours 13 mins
-    
-    FROM: 1145 N Mission Rd, Lincoln Heights, Los Angeles, CA 90033
-    TO: 1320 Chancellor St, Washington Square West, Philadelphia, PA 19107
-    Distance: 2,708 mi
-    Time: 1 day 15 hours
     --------------------------------------------------
     Calculating shortest route...
-    
+    Optimizing solution...
+
     Route:
-    300 Huntington Avenue, Boston
+    0 miles driven - origin
+    300 Huntington Ave, Boston
+
+    2 miles driven - The Druid
     1357 Cambridge St, Inman Square, Cambridge, MA 02139
+
+    309 miles driven - Franky Bradley's
     1320 Chancellor St, Washington Square West, Philadelphia, PA 19107
-    1145 N Mission Rd, Lincoln Heights, Los Angeles, CA 90033
+
+    619 miles driven - Biddy Early's
     141 Pearl St, Financial District, Boston, MA 02110
-    300 Huntington Avenue, Boston
-    
+
+    621 miles driven - origin
+    300 Huntington Ave, Boston
+
+    Total Distance Travelled: 621 miles
+
     Done!

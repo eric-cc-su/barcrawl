@@ -123,6 +123,6 @@ for index, city in enumerate(cities_index):
     previous = city
 route_distance += distances_matrix[cities_index[-1]][0]
 print("%d miles driven - %s\n%s\n" % (int(route_distance*0.00062137), prettyLocations[0][0], prettyLocations[0][1]))
-print("Total Distance Travelled: %d miles" % int(route_distance*0.00062137))
+print("Total Distance Traveled: %d miles" % int(route_distance*0.00062137))
 
 print('\nDone!')
