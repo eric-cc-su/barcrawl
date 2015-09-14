@@ -27,7 +27,7 @@ import oauth2
 API_HOST = 'api.yelp.com'
 DEFAULT_TERM = 'dinner'
 DEFAULT_LOCATION = 'San Francisco, CA'
-SEARCH_LIMIT = 3
+#SEARCH_LIMIT = 3
 SEARCH_PATH = '/v2/search/'
 BUSINESS_PATH = '/v2/business/'
 
@@ -77,7 +77,8 @@ def request(host, path, url_params=None):
 
     return response
 
-def search(term, location):
+#def search(term, location):
+def search(term, location, search_limit):
     """Query the Search API by a search term and location.
     Args:
         term (str): The search term passed to the API.
@@ -89,7 +90,7 @@ def search(term, location):
     url_params = {
         'term': term.replace(' ', '+'),
         'location': location.replace(' ', '+'),
-        'limit': SEARCH_LIMIT
+        'limit': search_limit
     }
     return request(API_HOST, SEARCH_PATH, url_params=url_params)
 
@@ -104,13 +105,15 @@ def get_business(business_id):
 
     return request(API_HOST, business_path)
 
-def query_api(term, location):
+#def query_api(term, location):
+def query_api(term, location, search_limit):
     """Queries the API by the input values from the user.
     Args:
         term (str): The search term to query.
         location (str): The location of the business to query.
     """
-    response = search(term, location)
+    response = search(term, location, search_limit)
+    #response = search(term, location)
 
     businesses = response.get('businesses')
 
@@ -118,18 +121,26 @@ def query_api(term, location):
         print (u'No businesses for {0} in {1} found.'.format(term, location))
         return
 
-    business_id = businesses[0]['id']
+    #pprint.pprint(businesses)
+    #print("%d businesses" % len(businesses))
+    business_details = []
+    for i in range(search_limit):
+        business_id = businesses[i]['id']
+        #business_id = businesses[0]['id']
 
-    print (u'Querying business info for the top result "{1}" ...'.format(
-        len(businesses),
-        business_id
-    ))
+        print (u'Querying business info for the top result "{1}" ...'.format(
+            len(businesses),
+            business_id
+        ))
 
-    response = get_business(business_id)
+        response = get_business(business_id)
 
-    print (u'Result for business "{0}" found:'.format(business_id))
+        print (u'Result for business "{0}" found:'.format(business_id))
+        business_details.append(response)
+
     #pprint.pprint(response, indent=2)
-    return response
+    #return response
+    return business_details
 
 
 def main():

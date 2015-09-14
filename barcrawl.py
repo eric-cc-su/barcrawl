@@ -7,6 +7,8 @@ import urllib2, sys, time
 import yelp
 import tsp_solver
 
+SEARCH_LIMIT = 1
+
 #Get the coordinates of the origin
 def get_origin(oAddress):
     url='https://maps.googleapis.com/maps/api/geocode/json'
@@ -17,8 +19,24 @@ def get_origin(oAddress):
     data = resp.json()
     lat = data['results'][0]['geometry']['location']['lat']
     lng = data['results'][0]['geometry']['location']['lng']
-    return('{},{}'.format(str(lat),str(lng)))
+    address_components = data['results'][0]['address_components']
+    for item in address_components:
+        if "locality" in item["types"]:
+            city = item["long_name"]
+    returnDict = {"coordinates": '{},{}'.format(str(lat),str(lng)), "city": city}
+    return(returnDict)
 
+
+def menu():
+    print('-' * 50 + "\n\n")
+    print( (" "*21) + "Barcrawl\n\n" )
+    locale = raw_input("Press 1 for national tour or 0 for city tour: ")
+    return locale
+
+while True:
+    locale = int(menu())
+    if locale in [0,1]:
+        break
 # ------
 # STEP 1 - Get top restaurants
 # ------
@@ -30,11 +48,17 @@ prettyLocations = []
 
 # Get origin address
 origin = raw_input('Enter starting address (Ex: 300 Huntington Avenue, Boston):  ')
-originCoordinates = get_origin(origin)
-locations.append(originCoordinates)
+originInfo = get_origin(origin)
+locations.append(originInfo["coordinates"])
+#originCoordinates = get_origin(origin)
+#locations.append(originCoordinates)
 prettyLocations.append(['origin',origin])
-# Get cities
-cities = raw_input('Enter cities (Ex: Boston,Cambridge,LA,Philadelphia):  ').split(',')
+if locale == 1:
+    # Get cities
+    cities = raw_input('Enter cities (Ex: Boston,Cambridge,LA,Philadelphia):  ').split(',')
+else:
+    SEARCH_LIMIT = int(raw_input("Enter the number of bars to visit: "))
+    cities = [originInfo["city"]]
 
 print('-' * 50)
 print('Getting bars...')
@@ -42,25 +66,26 @@ print('Getting bars...')
 for city in cities:
    try:
        print('')
-       response = yelp.query_api('bars', city)
+       response = yelp.query_api('bars', city, SEARCH_LIMIT)
        #pprint.pprint(response)
-       locations.append(str(response.get('location').get('coordinate').get('latitude')) + ',' +
-                        str(response.get('location').get('coordinate').get('longitude')))
-       # change to use coordinates to be more accurate
-       # Print out restaurant name and address
-       prettyName = ""
-       print(city + ':')
-       print(response.get('name'))
-       if len(response.get('location').get('display_address')) > 0:
-           prettyName += response.get('location').get('display_address')[0]
-           print(response.get('location').get('display_address')[0])
-       if len(response.get('location').get('display_address')) > 1:
-           prettyName += ", "+response.get('location').get('display_address')[1]
-           print(response.get('location').get('display_address')[1])
-       if len(response.get('location').get('display_address')) > 2:
-           prettyName += ", "+response.get('location').get('display_address')[2]
-           print(response.get('location').get('display_address')[2])
-       prettyLocations.append([response.get('name'),prettyName])
+       for item in response:
+           locations.append(str(item.get('location').get('coordinate').get('latitude')) + ',' +
+                            str(item.get('location').get('coordinate').get('longitude')))
+           # change to use coordinates to be more accurate
+           # Print out restaurant name and address
+           prettyName = ""
+           print("\n" + city + ':')
+           print(item.get('name'))
+           if len(item.get('location').get('display_address')) > 0:
+               prettyName += item.get('location').get('display_address')[0]
+               print(item.get('location').get('display_address')[0])
+           if len(item.get('location').get('display_address')) > 1:
+               prettyName += ", "+item.get('location').get('display_address')[1]
+               print(item.get('location').get('display_address')[1])
+           if len(item.get('location').get('display_address')) > 2:
+               prettyName += ", "+item.get('location').get('display_address')[2]
+               print(item.get('location').get('display_address')[2])
+           prettyLocations.append([item.get('name'),prettyName])
    except urllib2.HTTPError as error:
        sys.exit('Encountered HTTP error {0}. Abort program.'.format(error.code))
 
@@ -100,8 +125,8 @@ for i in range(0, len(locations)):
            distances_matrix[i][j] = data.get('routes')[0].get('legs')[0].get('distance').get('value')
            distances_matrix[j][i] = data.get('routes')[0].get('legs')[0].get('distance').get('value')
 
-           print('\nFROM: ' + prettyLocations[i][1] + "\nTO: "+ prettyLocations[j][1] + '\nDistance: ' + data.get('routes')[0].get('legs')[0].get('distance').get('text'))
-           print('Time: ' + data.get('routes')[0].get('legs')[0].get('duration').get('text'))
+           #print('\nFROM: ' + prettyLocations[i][1] + "\nTO: "+ prettyLocations[j][1] + '\nDistance: ' + data.get('routes')[0].get('legs')[0].get('distance').get('text'))
+           #print('Time: ' + data.get('routes')[0].get('legs')[0].get('duration').get('text'))
 
 print('-' * 50)
 # ------
