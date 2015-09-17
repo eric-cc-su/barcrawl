@@ -23,7 +23,10 @@ def get_origin(oAddress):
     for item in address_components:
         if "locality" in item["types"]:
             city = item["long_name"]
-    returnDict = {"coordinates": '{},{}'.format(str(lat),str(lng)), "city": city}
+    try:
+        returnDict = {"coordinates": '{},{}'.format(str(lat),str(lng)), "city": city}
+    except:
+        return False
     return(returnDict)
 
 
@@ -46,9 +49,15 @@ locations = []
 # User-friendly Addresses
 prettyLocations = []
 
-# Get origin address
-origin = raw_input('Enter starting address (Ex: 300 Huntington Avenue, Boston):  ')
-originInfo = get_origin(origin)
+while True:
+    # Get origin address
+    origin = raw_input('Enter starting address (Ex: 300 Huntington Avenue, Boston):  ')
+    originInfo = get_origin(origin)
+    if originInfo:
+        break
+    print("Not a searchable address! Please input a correct address")
+    time.sleep(1)
+
 locations.append(originInfo["coordinates"])
 #originCoordinates = get_origin(origin)
 #locations.append(originCoordinates)
@@ -61,7 +70,7 @@ else:
     cities = [originInfo["city"]]
 
 print('-' * 50)
-print('Getting bars...')
+counter = 0
 # Get list of top restaurants in each city
 for city in cities:
    try:
@@ -89,18 +98,24 @@ for city in cities:
    except urllib2.HTTPError as error:
        sys.exit('Encountered HTTP error {0}. Abort program.'.format(error.code))
 
-print('-' * 50)
+print('\n' + ('-' * 50))
 
 # ------
 # STEP 2 - Get distances between each restaurant
 # ------
-print('Getting distances...')
+#print('Getting distances...')
 # Generate list of locations to visit in order
 url = 'http://maps.googleapis.com/maps/api/directions/json'
 
 # Create 2D array to keep track of pairs of locations - USE NUMPY LATER
 pairs = [[0]*len(locations) for x in xrange(len(locations))]
 distances_matrix = [[0]*len(locations) for x in xrange(len(locations))]
+
+# Numbers to indicate progress
+lookupNum = 0
+for i in range(len(locations) - 1):
+    lookupNum += (i+1)
+counter = 0
 
 for i in range(0, len(locations)):
    for j in range(0, len(locations)):
@@ -124,19 +139,18 @@ for i in range(0, len(locations)):
            # Storing distances in matrix for tsp_solver
            distances_matrix[i][j] = data.get('routes')[0].get('legs')[0].get('distance').get('value')
            distances_matrix[j][i] = data.get('routes')[0].get('legs')[0].get('distance').get('value')
+           counter += 1
+           sys.stdout.write("\rGetting Distances...%d%%" % int((float(counter)/lookupNum) * 100))
+           sys.stdout.flush()
 
-           #print('\nFROM: ' + prettyLocations[i][1] + "\nTO: "+ prettyLocations[j][1] + '\nDistance: ' + data.get('routes')[0].get('legs')[0].get('distance').get('text'))
-           #print('Time: ' + data.get('routes')[0].get('legs')[0].get('duration').get('text'))
+print('\n' + ('-' * 50))
 
-print('-' * 50)
 # ------
 # STEP 3 - Algorithm to find shortest path
 # ------
 print('Calculating shortest route...')
 # Returns route cycle
 cities_index = tsp_solver.solve_tsp(distances_matrix, 3)
-#print(distances_matrix)
-#print(prettyLocations)
 
 # Start and end cycle at start location
 print('\nRoute:')

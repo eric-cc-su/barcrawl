@@ -67,7 +67,7 @@ def request(host, path, url_params=None):
     oauth_request.sign_request(oauth2.SignatureMethod_HMAC_SHA1(), consumer, token)
     signed_url = oauth_request.to_url()
 
-    print (u'Querying {0} ...'.format(url))
+    #print (u'Querying {0} ...'.format(url))
 
     conn = urllib2.urlopen(signed_url, None)
     try:
@@ -113,7 +113,6 @@ def query_api(term, location, search_limit):
         location (str): The location of the business to query.
     """
     response = search(term, location, search_limit)
-    #response = search(term, location)
 
     businesses = response.get('businesses')
 
@@ -121,21 +120,22 @@ def query_api(term, location, search_limit):
         print (u'No businesses for {0} in {1} found.'.format(term, location))
         return
 
-    #pprint.pprint(businesses)
-    #print("%d businesses" % len(businesses))
     business_details = []
     for i in range(search_limit):
         business_id = businesses[i]['id']
-        #business_id = businesses[0]['id']
 
+        """
         print (u'Querying business info for the top result "{1}" ...'.format(
             len(businesses),
             business_id
         ))
+        """
+        sys.stdout.write("\rGetting Bars...%d%%" % int((float(i)/search_limit) * 100))
+        sys.stdout.flush()
 
         response = get_business(business_id)
 
-        print (u'Result for business "{0}" found:'.format(business_id))
+        #print (u'Result for business "{0}" found:'.format(business_id))
         business_details.append(response)
 
     #pprint.pprint(response, indent=2)
