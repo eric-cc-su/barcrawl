@@ -32,11 +32,12 @@
 <body>
     <div class="maincontainer" id="index_search">
         <h1 class="text-center">Barcrawl</h1>
-        <h3>Bar crawl the most popular bars on Yelp!</h3>
-        <form action="/start/" method="post">
+        <h3 class="text-center">Bar crawl the most popular bars on Yelp!</h3>
+        <form action="/start/" method="post" id="bcform">
             {% csrf_token %}
-            <input class="form-control large-search center-block" type="text"
-               name="start_address" placeholder="Starting Address" required="true" id="start-input">
+                <input class="form-control large-search center-block" type="text" name="start_address" placeholder="Starting Address" required="true">
+                <input class="form-control large-search center-block" type="text" name="cities" placeholder="Cities (e.g. Boston, New York, ...)" required="true" style="display: none" disabled>
+                <input class="form-control large-search center-block" type="text" name="barcount" placeholder="Number of Bars" style="display: none" disabled>
             <button type="submit" class="btn btn-primary center-block" id="start address">Go!</button>
         </form>
     </div>
