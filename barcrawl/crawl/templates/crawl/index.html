@@ -7,6 +7,8 @@
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="{% static "js/bootstrap.min.js" %}"></script>
 
+    <script type="text/javascript" src="{% static 'js/index.js' %}"></script>
+
     <!-- Bootstrap -->
     <link href="{% static "css/bootstrap.css" %}" rel="stylesheet" type="text/css">
     <link href="/static/css/styles.css" rel="stylesheet" type="text/css">
@@ -28,8 +30,10 @@
 </head>
 
 <body>
-    <div class="maincontainer">
+    <div class="maincontainer" id="index_search">
         <h1 class="text-center">Barcrawl</h1>
-        <input class="form-control large-search center-block" type="text">
+        <input class="form-control large-search center-block" type="text"
+               placeholder="Starting Address">
+        <button type="button" class="btn btn-primary center-block">Go!</button>
     </div>
 </body>
