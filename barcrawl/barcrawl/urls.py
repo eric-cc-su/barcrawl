@@ -15,7 +15,10 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
+from crawl import views as cviews
 
 urlpatterns = [
-    url(r'^$', include('crawl.urls')),
+    #url(r'^$', include('crawl.urls')),
+    url(r'^$', cviews.index, name='index'),
+    url(r'^start/$', cviews.start),
 ]
