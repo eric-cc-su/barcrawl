@@ -1,0 +1,16 @@
+h1{
+    font-family: 'Oleo Script', cursive;
+    font-size: 100px;
+}
+
+.btn-primary {
+    margin-top: 20px;
+    padding: 8px 40px;
+}
+
+.large-search {
+    text-align: center;
+    font-size: 20px;
+    height: initial;
+    width: 600px;
+}
