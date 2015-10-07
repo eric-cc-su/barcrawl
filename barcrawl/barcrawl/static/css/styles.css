@@ -1,0 +1,11 @@
+h1{
+    font-family: 'Oleo Script', cursive;
+    font-size: 100px;
+}
+
+.large-search {
+    text-align: center;
+    font-size: 20px;
+    height: initial;
+    width: 600px;
+}
