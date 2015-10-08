@@ -29,17 +29,6 @@ def get_origin(oAddress):
         return False
     return(returnDict)
 
-
-def menu():
-    print('-' * 50 + "\n\n")
-    print( (" "*21) + "Barcrawl\n\n" )
-    locale = raw_input("Press 1 for national tour or 0 for city tour: ")
-    return locale
-
-while True:
-    locale = int(menu())
-    if locale in [0,1]:
-        break
 # ------
 # STEP 1 - Get top restaurants
 # ------
@@ -58,16 +47,22 @@ while True:
     print("Not a searchable address! Please input a correct address")
     time.sleep(1)
 
+print(originInfo)
 locations.append(originInfo["coordinates"])
+cities = [originInfo["city"]]
 #originCoordinates = get_origin(origin)
 #locations.append(originCoordinates)
 prettyLocations.append(['origin',origin])
-if locale == 1:
-    # Get cities
-    cities = raw_input('Enter cities (Ex: Boston,Cambridge,LA,Philadelphia):  ').split(',')
-else:
+
+# Get cities
+extra_cities = raw_input('Enter cities (Ex: Boston,Cambridge,LA,Philadelphia):  ').split(',')
+
+if len(extra_cities) > 0 and extra_cities[0] != '':
+    cities += extra_cities
+
+print(cities)
+if len(cities) == 1:
     SEARCH_LIMIT = int(raw_input("Enter the number of bars to visit: "))
-    cities = [originInfo["city"]]
 
 print('-' * 50)
 counter = 0
