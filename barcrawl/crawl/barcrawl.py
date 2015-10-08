@@ -7,7 +7,7 @@ import urllib2, sys, time
 import yelp
 import tsp_solver
 
-SEARCH_LIMIT = 1
+#SEARCH_LIMIT = 1
 
 #Get the coordinates of the origin
 def get_origin(oAddress):
@@ -32,40 +32,26 @@ def get_origin(oAddress):
 # ------
 # STEP 1 - Get top restaurants
 # ------
-def main():
+def main(cities, origin_address, origin_coordinates, search_limit=1):
+    SEARCH_LIMIT = 1
+    if search_limit != 1:
+        SEARCH_LIMIT = search_limit
     # coordinates of locations
     locations = []
     # User-friendly Addresses
     prettyLocations = []
 
-    while True:
-        # Get origin address
-        origin = raw_input('Enter starting address (Ex: 300 Huntington Avenue, Boston):  ')
-        originInfo = get_origin(origin)
-        if originInfo:
-            break
-        print("Not a searchable address! Please input a correct address")
-        time.sleep(1)
-
-
-    locations.append(originInfo["coordinates"])
+    locations.append(origin_coordinates)
     #originCoordinates = get_origin(origin)
     #locations.append(originCoordinates)
-    prettyLocations.append(['origin',origin])
+    prettyLocations.append(['origin',origin_address])
 
-    # Get cities
-    cities = raw_input('Enter cities (Ex: Boston,Cambridge,LA,Philadelphia):  ').split(',')
-
-    if len(cities) == 1:
-        SEARCH_LIMIT = int(raw_input("Enter the number of bars to visit: "))
-        cities = [originInfo["city"]]
-
-    print('-' * 50)
+    #print('-' * 50)
     counter = 0
     # Get list of top restaurants in each city
     for city in cities:
        try:
-           print('')
+           #print('')
            response = yelp.query_api('bars', city, SEARCH_LIMIT)
            #pprint.pprint(response)
            for item in response:
@@ -74,22 +60,22 @@ def main():
                # change to use coordinates to be more accurate
                # Print out restaurant name and address
                prettyName = ""
-               print("\n" + city + ':')
-               print(item.get('name'))
+               #print("\n" + city + ':')
+               #print(item.get('name'))
                if len(item.get('location').get('display_address')) > 0:
                    prettyName += item.get('location').get('display_address')[0]
-                   print(item.get('location').get('display_address')[0])
+                   #print(item.get('location').get('display_address')[0])
                if len(item.get('location').get('display_address')) > 1:
                    prettyName += ", "+item.get('location').get('display_address')[1]
-                   print(item.get('location').get('display_address')[1])
+                   #print(item.get('location').get('display_address')[1])
                if len(item.get('location').get('display_address')) > 2:
                    prettyName += ", "+item.get('location').get('display_address')[2]
-                   print(item.get('location').get('display_address')[2])
+                   #print(item.get('location').get('display_address')[2])
                prettyLocations.append([item.get('name'),prettyName])
        except urllib2.HTTPError as error:
            sys.exit('Encountered HTTP error {0}. Abort program.'.format(error.code))
 
-    print('\n' + ('-' * 50))
+    #print('\n' + ('-' * 50))
 
     # ------
     # STEP 2 - Get distances between each restaurant
@@ -134,12 +120,12 @@ def main():
                sys.stdout.write("\rGetting Distances...%d%%" % int((float(counter)/lookupNum) * 100))
                sys.stdout.flush()
 
-    print('\n' + ('-' * 50))
+    #print('\n' + ('-' * 50))
 
     # ------
     # STEP 3 - Algorithm to find shortest path
     # ------
-    print('Calculating shortest route...')
+    #print('Calculating shortest route...')
     # Returns route cycle
     cities_index = tsp_solver.solve_tsp(distances_matrix, 3)
 

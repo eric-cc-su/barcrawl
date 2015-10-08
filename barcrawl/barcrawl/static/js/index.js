@@ -2,32 +2,52 @@
  * Created by eric on 10/6/15.
  */
 
+//var origin_info;
+
 function submit_data() {
-    console.log("gotten");
+    //console.log("gotten");
     var xhr = new XMLHttpRequest();
     var action = $("#bcform").attr("action");
     xhr.open("POST", action, true);
     xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-    xhr.send($('#bcform').serialize());
+    request_data = $('#bcform').serialize();
+    console.log(request_data);
+    xhr.send(request_data);
+
+    var i = 0;
+    var interval = setInterval(function() {
+      i = ++i % 4;
+      $("#bcButton").html("Loading "+Array(i+1).join("."));
+    }, 800);
 
     xhr.onreadystatechange = function() {
+        console.log(xhr.readyState);
         if (xhr.readyState == 4 && xhr.status == 200) {
-            var relinquish = JSON.parse(xhr.responseText)["relinquish"];
+            var jsonResponse = JSON.parse(xhr.responseText);
+            var relinquish = jsonResponse["relinquish"];
             var newField = "input[name='" + relinquish + "']";
             $(newField).show();
             $(newField).prop("disabled",false);
-            $("#bcform").prop("action",JSON.parse(xhr.responseText)["action"]);
+            $("#bcform").prop("action",jsonResponse["action"]);
+            $("input[name='origin_city']").val(jsonResponse["origin_city"]); //update origin_info
+            $("input[name='origin_coordinates']").val(jsonResponse["origin_coordinates"]); //update origin_info
+            //console.log(origin_info);
+            clearInterval(interval);
+            if (jsonResponse["status"] == "ok") {
+                $("#bcButton").hide();
+                $("#complete").show();
+            }
+            $("#bcButton").html("Go!");
         }
     };
-
-    console.log("ajax'd");
+    //console.log("ajax'd");
 }
 
 var main = function() {
     var screenheight = window.innerHeight;   //measures the height of the user's screen
 
     //$("#index_search").css("margin-top", windowheight/3);
-    console.log(screenheight);
+    //console.log(screenheight);
     var maincontain = document.getElementById("index_search");
     maincontain.style.marginTop = (screenheight/4) + "px";
 

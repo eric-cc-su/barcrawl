@@ -47,17 +47,22 @@ while True:
     print("Not a searchable address! Please input a correct address")
     time.sleep(1)
 
+print(originInfo)
 locations.append(originInfo["coordinates"])
+cities = [originInfo["city"]]
 #originCoordinates = get_origin(origin)
 #locations.append(originCoordinates)
 prettyLocations.append(['origin',origin])
 
 # Get cities
-cities = raw_input('Enter cities (Ex: Boston,Cambridge,LA,Philadelphia):  ').split(',')
+extra_cities = raw_input('Enter cities (Ex: Boston,Cambridge,LA,Philadelphia):  ').split(',')
 
+if len(extra_cities) > 0 and extra_cities[0] != '':
+    cities += extra_cities
+
+print(cities)
 if len(cities) == 1:
     SEARCH_LIMIT = int(raw_input("Enter the number of bars to visit: "))
-    cities = [originInfo["city"]]
 
 print('-' * 50)
 counter = 0
