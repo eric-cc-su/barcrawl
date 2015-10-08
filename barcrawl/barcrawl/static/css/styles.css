@@ -19,3 +19,10 @@ h1{
 #index_search {
     text-align: center;
 }
+
+#map {
+    display: none;
+    height: 500px;
+    margin-top: 20px;
+    width: 500px;
+}

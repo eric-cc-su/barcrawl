@@ -31,7 +31,9 @@ function submit_data() {
             $("#bcform").prop("action",jsonResponse["action"]);
             $("input[name='origin_city']").val(jsonResponse["origin_city"]); //update origin_info
             $("input[name='origin_coordinates']").val(jsonResponse["origin_coordinates"]); //update origin_info
-            //console.log(origin_info);
+            if ($("#map").css("display") == "none") {
+                initMap(jsonResponse["origin_coordinates"]);
+            }
             clearInterval(interval);
             if (jsonResponse["status"] == "ok") {
                 $("#bcButton").hide();
@@ -46,8 +48,6 @@ function submit_data() {
 var main = function() {
     var screenheight = window.innerHeight;   //measures the height of the user's screen
 
-    //$("#index_search").css("margin-top", windowheight/3);
-    //console.log(screenheight);
     var maincontain = document.getElementById("index_search");
     maincontain.style.marginTop = (screenheight/4) + "px";
 
@@ -55,7 +55,29 @@ var main = function() {
         event.preventDefault();
         console.log("submitted");
         submit_data();
-    })
+    });
+
 };
+
+//Initialize a map with the origin location
+var map;
+function initMap(coordinate_string) {
+    var latlng = coordinate_string.split(",");
+
+    var originco = {lat: Number(latlng[0]), lng: Number(latlng[1])};
+
+    map = new google.maps.Map(document.getElementById('map'), {
+        center: originco,
+        zoom: 15
+      });
+
+    var origin_mark = new google.maps.Marker({
+        position: originco,
+        map: map,
+        label: "Origin"
+    });
+
+    $("#map").show();
+}
 
 $(document).ready(main);
