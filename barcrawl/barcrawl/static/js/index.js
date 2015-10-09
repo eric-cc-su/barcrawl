@@ -26,11 +26,15 @@ function submit_data() {
             var jsonResponse = JSON.parse(xhr.responseText);
             var relinquish = jsonResponse["relinquish"];
             var newField = "input[name='" + relinquish + "']";
+
+            //Reveal new input
             $(newField).show();
             $(newField).prop("disabled",false);
+            //Set new form URL
             $("#bcform").prop("action",jsonResponse["action"]);
-            $("input[name='origin_city']").val(jsonResponse["origin_city"]); //update origin_info
-            $("input[name='origin_coordinates']").val(jsonResponse["origin_coordinates"]); //update origin_info
+            //update origin_info
+            $("input[name='origin_city']").val(jsonResponse["origin_city"]);
+            $("input[name='origin_coordinates']").val(jsonResponse["origin_coordinates"]);
             if ($("#map").css("display") == "none") {
                 initMap(jsonResponse["origin_coordinates"]);
             }
@@ -38,6 +42,8 @@ function submit_data() {
             if (jsonResponse["status"] == "ok") {
                 $("#bcButton").hide();
                 $("#complete").show();
+                //console.log(jsonResponse["route_coordinates"]);
+                setMarkers(jsonResponse["route_coordinates"]);
             }
             $("#bcButton").html("Go!");
         }
@@ -78,6 +84,20 @@ function initMap(coordinate_string) {
     });
 
     $("#map").show();
+}
+
+function setMarkers(route) {
+    var coordinates = route;
+    console.log(coordinates);
+    for (i=1; i < coordinates.length; i++) {
+        var marker = new google.maps.Marker({
+            position: coordinates[i],
+            map: map,
+            label: String(i)
+        });
+
+        marker.setMap(map);
+    }
 }
 
 $(document).ready(main);

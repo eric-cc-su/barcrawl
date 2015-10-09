@@ -130,15 +130,25 @@ def main(cities, origin_address, origin_coordinates, search_limit=1):
     cities_index = tsp_solver.solve_tsp(distances_matrix, 3)
 
     # Start and end cycle at start location
-    print('\nRoute:')
+    #print('\nRoute:')
     route_distance = 0
     previous = 0
     for index, city in enumerate(cities_index):
         route_distance += distances_matrix[previous][city]
-        print("%d miles driven - %s\n%s\n" % (int(route_distance*0.00062137), prettyLocations[city][0], prettyLocations[city][1]))
+        #print("%d miles driven - %s\n%s\n" % (int(route_distance*0.00062137), prettyLocations[city][0], prettyLocations[city][1]))
         previous = city
     route_distance += distances_matrix[cities_index[-1]][0]
-    print("%d miles driven - %s\n%s\n" % (int(route_distance*0.00062137), prettyLocations[0][0], prettyLocations[0][1]))
-    print("Total Distance Traveled: %d miles" % int(route_distance*0.00062137))
+    #print("%d miles driven - %s\n%s\n" % (int(route_distance*0.00062137), prettyLocations[0][0], prettyLocations[0][1]))
+    #print("Total Distance Traveled: %d miles" % int(route_distance*0.00062137))
 
     print('\nDone!')
+    route_dict = {"route_coordinates":[],
+                  "route_names":[]}
+    for item in cities_index:
+        coordinates = locations[item].split(",")
+        coordict = {"lat": float(coordinates[0]),
+                    "lng": float(coordinates[1])}
+        route_dict["route_coordinates"].append(coordict)
+        route_dict["route_names"].append(prettyLocations[item][0])
+
+    return route_dict

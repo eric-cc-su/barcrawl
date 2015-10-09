@@ -51,19 +51,23 @@ def cities(request):
 
         else:
             #call barcrawl app
-            barcrawl.main(cities, request.POST['start_address'], request.POST['origin_coordinates'])
+            route = barcrawl.main(cities, request.POST['start_address'], request.POST['origin_coordinates'])
+
+            route["status"] = "ok";
             #PLACEHOLDER - EDIT TO BEGIN SEARCHING
-            return HttpResponse(json.dumps({"status":"ok"}),
+            return HttpResponse(json.dumps(route),
                                 content_type="application/json")
 
 #Bar Crawl within one city
 def onecity(request):
     if request.POST:
-        barcount = request.POST['barcount']
+        barcount = int(request.POST['barcount'])
         #PLACEHOLDER - EDIT TO BEGIN SEARCHING
         cities = [request.POST['origin_city']]
         #call barcrawl app
-        barcrawl.main(cities, request.POST['start_address'], request.POST['origin_coordinates'], int(request.POST['barcount']))
+        route = barcrawl.main(cities, request.POST['start_address'], request.POST['origin_coordinates'], barcount)
 
-        return HttpResponse(json.dumps({"status":"ok"}),
+        route["status"] = "ok";
+        #PLACEHOLDER - EDIT TO BEGIN SEARCHING
+        return HttpResponse(json.dumps(route),
                             content_type="application/json")
