@@ -42,8 +42,6 @@ def main(cities, origin_address, origin_coordinates, search_limit=1):
     prettyLocations = []
 
     locations.append(origin_coordinates)
-    #originCoordinates = get_origin(origin)
-    #locations.append(originCoordinates)
     prettyLocations.append(['origin',origin_address])
 
     #print('-' * 50)
@@ -60,8 +58,6 @@ def main(cities, origin_address, origin_coordinates, search_limit=1):
                # change to use coordinates to be more accurate
                # Print out restaurant name and address
                prettyName = ""
-               #print("\n" + city + ':')
-               #print(item.get('name'))
                if len(item.get('location').get('display_address')) > 0:
                    prettyName += item.get('location').get('display_address')[0]
                    #print(item.get('location').get('display_address')[0])
@@ -147,12 +143,14 @@ def main(cities, origin_address, origin_coordinates, search_limit=1):
     route_dict = {"origin_coordinates":{"lat": float(origin_coordinates.split(",")[0]),
                                         "lng": float(origin_coordinates.split(",")[1])},
                   "route_coordinates":[],
-                  "route_names":[]}
+                  "route_names":[],
+                  "route_addresses":[]}
     for item in cities_index:
         coordinates = locations[item].split(",")
         coordict = {"lat": float(coordinates[0]),
                     "lng": float(coordinates[1])}
         route_dict["route_coordinates"].append(coordict)
         route_dict["route_names"].append(prettyLocations[item][0])
+        route_dict["route_addresses"].append(prettyLocations[item][1])
 
     return route_dict

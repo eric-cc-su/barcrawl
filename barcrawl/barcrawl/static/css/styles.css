@@ -30,6 +30,24 @@ h1{
     display: none;
     height: 500px;
     margin-top: 20px;
-    margin-bottom: 50px;
     width: 500px;
+}
+
+#route_details {
+    display: none;
+    margin: 50px auto 0;
+    text-align: left;
+    max-width: 500px;
+}
+
+ol {
+    font-size: 24px;
+}
+
+ol li h3 {
+    margin-bottom: 0;
+}
+
+ol li p {
+    font-size: 18px;
 }
