@@ -35,15 +35,14 @@ function submit_data() {
             //update origin_info
             $("input[name='origin_city']").val(jsonResponse["origin_city"]);
             $("input[name='origin_coordinates']").val(jsonResponse["origin_coordinates"]);
-            if ($("#map").css("display") == "none") {
-                initMap(jsonResponse["origin_coordinates"]);
-            }
             clearInterval(interval);
             if (jsonResponse["status"] == "ok") {
                 $("#bcButton").hide();
-                $("#complete").show();
                 //console.log(jsonResponse["route_coordinates"]);
-                setMarkers(jsonResponse["route_coordinates"]);
+                initMap(jsonResponse["origin_coordinates"]);
+                setMarkers(jsonResponse["route_coordinates"], jsonResponse["route_names"]);
+                $("input").hide();
+                $("#index_search").css("margin-top","0");
             }
             $("#bcButton").html("Go!");
         }
@@ -53,9 +52,12 @@ function submit_data() {
 
 var main = function() {
     var screenheight = window.innerHeight;   //measures the height of the user's screen
+    var screenWidth = window.innerWidth;
+
 
     var maincontain = document.getElementById("index_search");
     maincontain.style.marginTop = (screenheight/4) + "px";
+
 
     $("#bcform").on('submit', function(event) {
         event.preventDefault();
@@ -67,37 +69,47 @@ var main = function() {
 
 //Initialize a map with the origin location
 var map;
-function initMap(coordinate_string) {
-    var latlng = coordinate_string.split(",");
-
-    var originco = {lat: Number(latlng[0]), lng: Number(latlng[1])};
+function initMap(origin_coordinates) {
 
     map = new google.maps.Map(document.getElementById('map'), {
-        center: originco,
-        zoom: 15
+        center: origin_coordinates,
       });
 
+    /*
     var origin_mark = new google.maps.Marker({
-        position: originco,
+        position: origin_coordinates,
         map: map,
         label: "Origin"
     });
-
+    */
     $("#map").show();
 }
 
-function setMarkers(route) {
+function setMarkers(route, names) {
+    var bounds = new google.maps.LatLngBounds();
     var coordinates = route;
-    console.log(coordinates);
-    for (i=1; i < coordinates.length; i++) {
+    //console.log(coordinates);
+    for (i=0; i < coordinates.length; i++) {
         var marker = new google.maps.Marker({
             position: coordinates[i],
             map: map,
-            label: String(i)
+            label: String(i),
+            title: names[i]
         });
 
+        //console.log(coordinates[i]["lat"], coordinates[i]["lng"]);
+        var LatLng = new google.maps.LatLng(coordinates[i]["lat"], coordinates[i]["lng"]);
         marker.setMap(map);
+        bounds.extend(LatLng);
     }
+
+    //console.log({lat: coordinates[-1]["lat"], lng: coordinates[-1]["lng"]});
+    //var origin = google.maps.LatLng(coordinates[0]["lat"], coordinates[0]["lng"]);
+    //var last = google.maps.LatLng(coordinates[-1]["lat"], coordinates[-1]["lng"]);
+
+    map.fitBounds(bounds);
+
+    //map.setZoom(12);
 }
 
 $(document).ready(main);

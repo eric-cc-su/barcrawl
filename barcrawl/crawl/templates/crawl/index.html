@@ -34,19 +34,21 @@
 </head>
 
 <body>
-    <div class="maincontainer" id="index_search">
-        <h1>Barcrawl</h1>
-        <h3>Bar crawl the most popular bars on Yelp!</h3>
-        <form action="/start/" method="post" id="bcform">
-            {% csrf_token %}
-                <input class="form-control large-search center-block" type="text" name="start_address" placeholder="Starting Address" required="true">
-                <input type="hidden" name="origin_city">
-                <input type="hidden" name="origin_coordinates">
-                <input class="form-control large-search center-block" type="text" name="cities" placeholder="Other Cities (e.g. Boston, New York City, ...)" style="display: none" disabled>
-                <input class="form-control large-search center-block" type="text" name="barcount" placeholder="Number of Bars" style="display: none" disabled>
-            <button type="submit" class="btn btn-primary center-block" id="bcButton">Go!</button>
-        </form>
-        <h3 id="complete" hidden>Done!</h3>
-        <div class="center-block" id="map"></div>
+    <div class="container-fluid">
+        <div class="col-md-12 maincontainer" id="index_search">
+            <h1>Barcrawl</h1>
+            <h3>Bar crawl the most popular bars on Yelp!</h3>
+            <form action="/start/" method="post" id="bcform">
+                {% csrf_token %}
+                    <input class="form-control large-search center-block" type="text" name="start_address" placeholder="Starting Address" required="true">
+                    <input type="hidden" name="origin_city">
+                    <input type="hidden" name="origin_coordinates">
+                    <input class="form-control large-search center-block" type="text" name="cities" placeholder="Other Cities (e.g. Boston, New York City, ...)" style="display: none" disabled>
+                    <input class="form-control large-search center-block" type="text" name="barcount" placeholder="Number of Bars" style="display: none" disabled>
+                <button type="submit" class="btn btn-primary center-block" id="bcButton">Go!</button>
+            </form>
+            <h3 id="complete" hidden>Done!</h3>
+            <div class="center-block" id="map"></div>
+        </div>
     </div>
 </body>

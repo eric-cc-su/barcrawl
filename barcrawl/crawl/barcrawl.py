@@ -127,6 +127,8 @@ def main(cities, origin_address, origin_coordinates, search_limit=1):
     # ------
     #print('Calculating shortest route...')
     # Returns route cycle
+
+    print(distances_matrix)
     cities_index = tsp_solver.solve_tsp(distances_matrix, 3)
 
     # Start and end cycle at start location
@@ -142,7 +144,9 @@ def main(cities, origin_address, origin_coordinates, search_limit=1):
     #print("Total Distance Traveled: %d miles" % int(route_distance*0.00062137))
 
     print('\nDone!')
-    route_dict = {"route_coordinates":[],
+    route_dict = {"origin_coordinates":{"lat": float(origin_coordinates.split(",")[0]),
+                                        "lng": float(origin_coordinates.split(",")[1])},
+                  "route_coordinates":[],
                   "route_names":[]}
     for item in cities_index:
         coordinates = locations[item].split(",")

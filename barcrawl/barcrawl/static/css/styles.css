@@ -1,6 +1,12 @@
 h1{
     font-family: 'Oleo Script', cursive;
-    font-size: 100px;
+    font-size: 100px
+}
+
+@media screen and (max-width: 768px) {
+    h1 {
+        font-size: -webkit-xxx-large;
+    }
 }
 
 .btn-primary {
@@ -13,7 +19,7 @@ h1{
     font-size: 20px;
     height: initial;
     margin-top: 20px;
-    width: 600px;
+    width: 80%;
 }
 
 #index_search {
