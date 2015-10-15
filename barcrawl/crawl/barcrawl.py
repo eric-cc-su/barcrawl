@@ -44,14 +44,11 @@ def main(cities, origin_address, origin_coordinates, search_limit=1):
     locations.append(origin_coordinates)
     prettyLocations.append(['origin',origin_address])
 
-    #print('-' * 50)
     counter = 0
     # Get list of top restaurants in each city
     for city in cities:
        try:
-           #print('')
            response = yelp.query_api('bars', city, SEARCH_LIMIT)
-           #pprint.pprint(response)
            for item in response:
                locations.append(str(item.get('location').get('coordinate').get('latitude')) + ',' +
                                 str(item.get('location').get('coordinate').get('longitude')))
@@ -71,12 +68,9 @@ def main(cities, origin_address, origin_coordinates, search_limit=1):
        except urllib2.HTTPError as error:
            sys.exit('Encountered HTTP error {0}. Abort program.'.format(error.code))
 
-    #print('\n' + ('-' * 50))
-
     # ------
     # STEP 2 - Get distances between each restaurant
     # ------
-    #print('Getting distances...')
     # Generate list of locations to visit in order
     url = 'http://maps.googleapis.com/maps/api/directions/json'
 
@@ -116,12 +110,9 @@ def main(cities, origin_address, origin_coordinates, search_limit=1):
                sys.stdout.write("\rGetting Distances...%d%%" % int((float(counter)/lookupNum) * 100))
                sys.stdout.flush()
 
-    #print('\n' + ('-' * 50))
-
     # ------
     # STEP 3 - Algorithm to find shortest path
     # ------
-    #print('Calculating shortest route...')
     # Returns route cycle
 
     print(distances_matrix)
@@ -133,11 +124,8 @@ def main(cities, origin_address, origin_coordinates, search_limit=1):
     previous = 0
     for index, city in enumerate(cities_index):
         route_distance += distances_matrix[previous][city]
-        #print("%d miles driven - %s\n%s\n" % (int(route_distance*0.00062137), prettyLocations[city][0], prettyLocations[city][1]))
         previous = city
     route_distance += distances_matrix[cities_index[-1]][0]
-    #print("%d miles driven - %s\n%s\n" % (int(route_distance*0.00062137), prettyLocations[0][0], prettyLocations[0][1]))
-    #print("Total Distance Traveled: %d miles" % int(route_distance*0.00062137))
 
     print('\nDone!')
     route_dict = {"origin_coordinates":{"lat": float(origin_coordinates.split(",")[0]),
