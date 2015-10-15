@@ -35,6 +35,7 @@ h1{
 
 #route_details {
     display: none;
+    list-style: none;
     margin: 50px auto 0;
     text-align: left;
     max-width: 500px;

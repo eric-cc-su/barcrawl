@@ -37,8 +37,13 @@ def cities(request):
 
         #Get other cities
         extra_cities = request.POST['cities'].split(",")
-        if len(extra_cities) > 0 and extra_cities[0] != '':
-            cities += extra_cities
+        for city in extra_cities:
+            if (city != ''):
+                try:
+                    cities.index(city)
+                    continue
+                except ValueError:
+                    cities.append(city)
 
         #Only listed one city
         if (len(cities) == 1):

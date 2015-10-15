@@ -8,7 +8,6 @@ function submit_data() {
     xhr.open("POST", action, true);
     xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
     request_data = $('#bcform').serialize();
-    console.log(request_data);
     xhr.send(request_data);
 
     var i = 0;
@@ -18,7 +17,6 @@ function submit_data() {
     }, 800);
 
     xhr.onreadystatechange = function() {
-        console.log(xhr.readyState);
         if (xhr.readyState == 4 && xhr.status == 200) {
             processResponse(xhr.responseText, interval);
         }
@@ -33,7 +31,6 @@ var main = function() {
 
     $("#bcform").on('submit', function(event) {
         event.preventDefault();
-        console.log("submitted");
         submit_data();
     });
 
@@ -74,15 +71,12 @@ function processResponse(responseText, interval) {
         $("#route_details").show();
         initMap(jsonResponse["origin_coordinates"]);
         setMarkers(jsonResponse["route_coordinates"], jsonResponse["route_names"], jsonResponse["route_addresses"]);
-
         $("#index_search").css("margin-top","0");
     }
-    console.log(jsonResponse);
 
     $("#bcButton").html("Go!");
 
     if (jsonResponse["relinquish"] == "cities") {
-
         $("#bcButton").html("Skip");
     }
 }
@@ -107,7 +101,7 @@ function initMap(origin_coordinates) {
 function writeStops(names, addresses, index) {
     var li = document.createElement("li");                      // create <li>
     var title = document.createElement("h3");                   // create <h3>
-    var t = document.createTextNode(names[index]);                  // define h3 text
+    var t = document.createTextNode(names[index]);              // define h3 text
     var par = document.createElement("p");                      // create <p>
     var tp = document.createTextNode(addresses[index]);    // define p text
 

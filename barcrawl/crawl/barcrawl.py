@@ -42,7 +42,7 @@ def main(cities, origin_address, origin_coordinates, search_limit=1):
     prettyLocations = []
 
     locations.append(origin_coordinates)
-    prettyLocations.append(['origin',origin_address])
+    prettyLocations.append(['Origin',origin_address])
 
     counter = 0
     # Get list of top restaurants in each city
