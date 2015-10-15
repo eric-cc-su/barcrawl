@@ -24,9 +24,9 @@ secretFile = open(secret)
 SECRET_KEY = secretFile.readline().strip()
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1','.elasticbeanstalk.com']
 
 # Application definition
 
