@@ -2,6 +2,16 @@
  * Created by eric on 10/6/15.
  */
 
+function calculate_numbers() {
+    var screenheight = window.innerHeight;   //measures the height of the user's screen
+
+    var maincontain = document.getElementById("index_search");
+    maincontain.style.marginTop = (screenheight/4) + "px";
+    var fluid = document.getElementsByClassName("container-fluid")[0];
+    var footerHeight = document.getElementById("footer").scrollHeight;
+    fluid.style.height = (screenheight - footerHeight) + "px";
+}
+
 function submit_data() {
     var xhr = new XMLHttpRequest();
     var action = $("#bcform").attr("action");
@@ -12,8 +22,9 @@ function submit_data() {
 
     var i = 0;
     var interval = setInterval(function() {
-      i = ++i % 4;
-      $("#bcButton").html("Loading "+Array(i+1).join("."));
+        i = ++i % 4;
+        $("#bcButton").html("Loading "+Array(i+1).join("."));
+        $("#title a").html(Array(3-i).join(" ") + Array(i+1).join("~") + " Barcrawl " + Array(i+1).join("~"));
     }, 800);
 
     xhr.onreadystatechange = function() {
@@ -24,10 +35,11 @@ function submit_data() {
 }
 
 var main = function() {
-    var screenheight = window.innerHeight;   //measures the height of the user's screen
+    calculate_numbers();
 
-    var maincontain = document.getElementById("index_search");
-    maincontain.style.marginTop = (screenheight/4) + "px";
+    window.onresize = function() {
+        calculate_numbers();
+    };
 
     $("#bcform").on('submit', function(event) {
         event.preventDefault();
@@ -65,6 +77,8 @@ function processResponse(responseText, interval) {
 
     // bar crawl done
     if (jsonResponse["status"] == "ok") {
+        var fluid = document.getElementsByClassName("container-fluid")[0];
+        fluid.style.height = "inherit";
         $("#bcButton").hide();
         $("#subtitle").hide();
         $("input").hide();
@@ -74,6 +88,7 @@ function processResponse(responseText, interval) {
         $("#index_search").css("margin-top","0");
     }
 
+    $("#title a").html("Barcrawl");
     $("#bcButton").html("Go!");
 
     if (jsonResponse["relinquish"] == "cities") {

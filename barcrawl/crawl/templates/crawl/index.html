@@ -36,7 +36,7 @@
 <body>
     <div class="container-fluid">
         <div class="col-md-12 maincontainer" id="index_search">
-            <h1>Barcrawl</h1>
+            <h1 id="title"><a href="/" style="text-decoration: none; color: black;">Barcrawl</a></h1>
             <h3 id="subtitle">Bar crawl the most popular bars on Yelp!</h3>
             <form action="/start/" method="post" id="bcform">
                 {% csrf_token %}
@@ -53,5 +53,8 @@
                 </ol>
             </div>
         </div>
+    </div>
+    <div id="footer">
+        <p>&copy 2015 <a href="http://ericsu.me/">Eric Su</a></p>
     </div>
 </body>
