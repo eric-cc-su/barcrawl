@@ -102,20 +102,23 @@ def main(cities, origin_address, origin_coordinates, search_limit=1):
                time.sleep(0.5)
                resp = requests.get(url=url, params=params)
                data = json.loads(resp.text)
-
-               # Storing distances in matrix for tsp_solver
-               distances_matrix[i][j] = data.get('routes')[0].get('legs')[0].get('distance').get('value')
-               distances_matrix[j][i] = data.get('routes')[0].get('legs')[0].get('distance').get('value')
-               counter += 1
-               sys.stdout.write("\rGetting Distances...%d%%" % int((float(counter)/lookupNum) * 100))
-               sys.stdout.flush()
+               if (data.get('status') == 'ZERO_RESULTS'):
+                   return {"status": 500,
+                           "message": "Directions not found from " + prettyLocations[i][1]
+                                         + " to " + prettyLocations[j][1]}
+               else:
+                   # Storing distances in matrix for tsp_solver
+                   distances_matrix[i][j] = data.get('routes')[0].get('legs')[0].get('distance').get('value')
+                   distances_matrix[j][i] = data.get('routes')[0].get('legs')[0].get('distance').get('value')
+                   counter += 1
+                   sys.stdout.write("\rGetting Distances...%d%%" % int((float(counter)/lookupNum) * 100))
+                   sys.stdout.flush()
 
     # ------
     # STEP 3 - Algorithm to find shortest path
     # ------
     # Returns route cycle
 
-    print(distances_matrix)
     cities_index = tsp_solver.solve_tsp(distances_matrix, 3)
 
     # Start and end cycle at start location
@@ -132,7 +135,8 @@ def main(cities, origin_address, origin_coordinates, search_limit=1):
                                         "lng": float(origin_coordinates.split(",")[1])},
                   "route_coordinates":[],
                   "route_names":[],
-                  "route_addresses":[]}
+                  "route_addresses":[],
+                  "status": 200}
     for item in cities_index:
         coordinates = locations[item].split(",")
         coordict = {"lat": float(coordinates[0]),

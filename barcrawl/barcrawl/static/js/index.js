@@ -24,12 +24,22 @@ function submit_data() {
     var interval = setInterval(function() {
         i = ++i % 4;
         $("#bcButton").html("Loading "+Array(i+1).join("."));
-        $("#title a").html(Array(3-i).join(" ") + Array(i+1).join("~") + " Barcrawl " + Array(i+1).join("~"));
+        if (window.innerWidth > 768) {
+            $("#title a").html(Array(3-i).join(" ") + Array(i+1).join("~") + " Barcrawl " + Array(i+1).join("~"));
+        }
     }, 800);
 
     xhr.onreadystatechange = function() {
-        if (xhr.readyState == 4 && xhr.status == 200) {
-            processResponse(xhr.responseText, interval);
+        if (xhr.readyState == 4) {
+            console.log(xhr.response);
+            if (xhr.status == 200) {
+                processResponse(xhr.responseText, interval);
+            }
+            else if (xhr.status == 500) {
+                alert("Sorry! This is an internal server error 500. Please try different inputs and report " +
+                    "the issue to github.com/eric-cc-su/barcrawl");
+                window.location.reload();
+            }
         }
     };
 }
@@ -38,7 +48,9 @@ var main = function() {
     calculate_numbers();
 
     window.onresize = function() {
-        calculate_numbers();
+        if (window.innerWidth > 768) {
+            calculate_numbers();
+        }
     };
 
     $("#bcform").on('submit', function(event) {

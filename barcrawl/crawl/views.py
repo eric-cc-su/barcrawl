@@ -1,5 +1,5 @@
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
 from django.shortcuts import render, redirect
 import barcrawl
 import json
@@ -29,6 +29,7 @@ def start(request):
             return HttpResponse(response,
                                 content_type="application/json",
                                 status_code=401)
+
 #Get list of cities
 def cities(request):
     if request.POST:
@@ -57,11 +58,13 @@ def cities(request):
         else:
             #call barcrawl app
             route = barcrawl.main(cities, request.POST['start_address'], request.POST['origin_coordinates'])
+            status = route["status"]
+            if route["status"] == 200:
+                route["status"] = "ok"
 
-            route["status"] = "ok";
-            #PLACEHOLDER - EDIT TO BEGIN SEARCHING
             return HttpResponse(json.dumps(route),
-                                content_type="application/json")
+                                content_type="application/json",
+                                status=status)
 
 #Bar Crawl within one city
 def onecity(request):
@@ -71,8 +74,10 @@ def onecity(request):
         cities = [request.POST['origin_city']]
         #call barcrawl app
         route = barcrawl.main(cities, request.POST['start_address'], request.POST['origin_coordinates'], barcount)
+        status = route["status"]
+        if route["status"] == 200:
+            route["status"] = "ok"
 
-        route["status"] = "ok";
-        #PLACEHOLDER - EDIT TO BEGIN SEARCHING
         return HttpResponse(json.dumps(route),
-                            content_type="application/json")
+                            content_type="application/json",
+                            status=status)
