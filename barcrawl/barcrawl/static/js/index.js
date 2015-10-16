@@ -31,7 +31,6 @@ function submit_data() {
 
     xhr.onreadystatechange = function() {
         if (xhr.readyState == 4) {
-            console.log(xhr.response);
             if (xhr.status == 200) {
                 processResponse(xhr.responseText, interval);
             }
@@ -48,7 +47,7 @@ var main = function() {
     calculate_numbers();
 
     window.onresize = function() {
-        if (window.innerWidth > 768) {
+        if (window.innerWidth > 768 && $("#map").css("display") == "none") {
             calculate_numbers();
         }
     };

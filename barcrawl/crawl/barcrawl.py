@@ -3,17 +3,25 @@
 # Output:  Route to the highest rated bar in each city
 
 import json, requests # for making request to Google Maps
+import os
 import urllib2, sys, time
 import yelp
 import tsp_solver
 
 #SEARCH_LIMIT = 1
 
+def get_server_key():
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    gserverFile = open(os.path.join(BASE_DIR, "googleServer.txt"))
+    key = gserverFile.readline().strip()
+    gserverFile.close()
+    return key
+
 #Get the coordinates of the origin
 def get_origin(oAddress):
     url='https://maps.googleapis.com/maps/api/geocode/json'
-    params = dict(address=oAddress)
-
+    params = dict(address = oAddress,
+                  key = get_server_key())
     # Send request to Google Maps
     resp = requests.get(url=url, params=params)
     data = resp.json()
@@ -52,18 +60,14 @@ def main(cities, origin_address, origin_coordinates, search_limit=1):
            for item in response:
                locations.append(str(item.get('location').get('coordinate').get('latitude')) + ',' +
                                 str(item.get('location').get('coordinate').get('longitude')))
-               # change to use coordinates to be more accurate
-               # Print out restaurant name and address
+               # Save restaurant name and address
                prettyName = ""
                if len(item.get('location').get('display_address')) > 0:
                    prettyName += item.get('location').get('display_address')[0]
-                   #print(item.get('location').get('display_address')[0])
                if len(item.get('location').get('display_address')) > 1:
                    prettyName += ", "+item.get('location').get('display_address')[1]
-                   #print(item.get('location').get('display_address')[1])
                if len(item.get('location').get('display_address')) > 2:
                    prettyName += ", "+item.get('location').get('display_address')[2]
-                   #print(item.get('location').get('display_address')[2])
                prettyLocations.append([item.get('name'),prettyName])
        except urllib2.HTTPError as error:
            sys.exit('Encountered HTTP error {0}. Abort program.'.format(error.code))
@@ -72,7 +76,7 @@ def main(cities, origin_address, origin_coordinates, search_limit=1):
     # STEP 2 - Get distances between each restaurant
     # ------
     # Generate list of locations to visit in order
-    url = 'http://maps.googleapis.com/maps/api/directions/json'
+    url = 'https://maps.googleapis.com/maps/api/directions/json'
 
     # Create 2D array to keep track of pairs of locations - USE NUMPY LATER
     pairs = [[0]*len(locations) for x in xrange(len(locations))]
@@ -90,8 +94,9 @@ def main(cities, origin_address, origin_coordinates, search_limit=1):
            if pairs[i][j] != 1 and i != j:
                # Set parameters
                params = dict(
-                   origin=locations[i],
-                   destination=locations[j]
+                   origin = locations[i],
+                   destination = locations[j],
+                   key = get_server_key()
                )
 
                # Set to 1 to skip later
@@ -99,7 +104,7 @@ def main(cities, origin_address, origin_coordinates, search_limit=1):
                pairs[j][i] = 1
 
                # Send request to Google Maps
-               time.sleep(0.5)
+               time.sleep(0.1)
                resp = requests.get(url=url, params=params)
                data = json.loads(resp.text)
                if (data.get('status') == 'ZERO_RESULTS'):
@@ -122,7 +127,6 @@ def main(cities, origin_address, origin_coordinates, search_limit=1):
     cities_index = tsp_solver.solve_tsp(distances_matrix, 3)
 
     # Start and end cycle at start location
-    #print('\nRoute:')
     route_distance = 0
     previous = 0
     for index, city in enumerate(cities_index):

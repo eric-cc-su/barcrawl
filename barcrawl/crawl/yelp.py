@@ -22,7 +22,7 @@ except ImportError:
     import urllib2
 
 import oauth2
-
+import os
 
 API_HOST = 'api.yelp.com'
 DEFAULT_TERM = 'dinner'
@@ -31,11 +31,23 @@ DEFAULT_LOCATION = 'San Francisco, CA'
 SEARCH_PATH = '/v2/search/'
 BUSINESS_PATH = '/v2/business/'
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# read Yelp keys from separate file
+yelpPath = os.path.join(BASE_DIR, "yelpkey.txt")
+yelpFile = open(yelpPath)
+yelpKeys = {}
+for line in yelpFile:
+    line = line.split(" ")
+    yelpKeys[ line[0] ] = line[1].strip("\n")
+
+yelpFile.close()
+
 # OAuth credential placeholders that must be filled in by users.
-CONSUMER_KEY = 'MapfPwZlG1iuz9Acja1hUA'
-CONSUMER_SECRET = 'ab5uLcItYvNO4FraBskwug5FKoc'
-TOKEN = 'dli5QisyRwIiG05K4R34VRO3HhpUEYeU'
-TOKEN_SECRET = 'Z949X5mUkHw_eSTQA_nxFft0UJ4'
+CONSUMER_KEY = yelpKeys["CONSUMER_KEY"]
+CONSUMER_SECRET = yelpKeys["CONSUMER_SECRET"]
+TOKEN = yelpKeys["TOKEN"]
+TOKEN_SECRET = yelpKeys["TOKEN_SECRET"]
 
 
 def request(host, path, url_params=None):

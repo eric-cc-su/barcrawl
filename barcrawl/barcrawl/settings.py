@@ -22,8 +22,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 secret = os.path.join(BASE_DIR, "secret.txt")
 secretFile = open(secret)
 SECRET_KEY = secretFile.readline().strip()
+secretFile.close()
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
 ALLOWED_HOSTS = ['127.0.0.1','.elasticbeanstalk.com', '192.168.1.121']
