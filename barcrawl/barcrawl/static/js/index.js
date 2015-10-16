@@ -2,38 +2,58 @@
  * Created by eric on 10/6/15.
  */
 
+function calculate_numbers() {
+    var screenheight = window.innerHeight;   //measures the height of the user's screen
+
+    var maincontain = document.getElementById("index_search");
+    maincontain.style.marginTop = (screenheight/4) + "px";
+    var fluid = document.getElementsByClassName("container-fluid")[0];
+    var footerHeight = document.getElementById("footer").scrollHeight;
+    fluid.style.height = (screenheight - footerHeight) + "px";
+}
+
 function submit_data() {
     var xhr = new XMLHttpRequest();
     var action = $("#bcform").attr("action");
     xhr.open("POST", action, true);
     xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
     request_data = $('#bcform').serialize();
-    console.log(request_data);
     xhr.send(request_data);
 
     var i = 0;
     var interval = setInterval(function() {
-      i = ++i % 4;
-      $("#bcButton").html("Loading "+Array(i+1).join("."));
+        i = ++i % 4;
+        $("#bcButton").html("Loading "+Array(i+1).join("."));
+        if (window.innerWidth > 768) {
+            $("#title a").html(Array(3-i).join(" ") + Array(i+1).join("~") + " Barcrawl " + Array(i+1).join("~"));
+        }
     }, 800);
 
     xhr.onreadystatechange = function() {
-        console.log(xhr.readyState);
-        if (xhr.readyState == 4 && xhr.status == 200) {
-            processResponse(xhr.responseText, interval);
+        if (xhr.readyState == 4) {
+            if (xhr.status == 200) {
+                processResponse(xhr.responseText, interval);
+            }
+            else if (xhr.status == 500) {
+                alert("Sorry! This is an internal server error 500. Please try different inputs and report " +
+                    "the issue to github.com/eric-cc-su/barcrawl");
+                window.location.reload();
+            }
         }
     };
 }
 
 var main = function() {
-    var screenheight = window.innerHeight;   //measures the height of the user's screen
+    calculate_numbers();
 
-    var maincontain = document.getElementById("index_search");
-    maincontain.style.marginTop = (screenheight/4) + "px";
+    window.onresize = function() {
+        if (window.innerWidth > 768 && $("#map").css("display") == "none") {
+            calculate_numbers();
+        }
+    };
 
     $("#bcform").on('submit', function(event) {
         event.preventDefault();
-        console.log("submitted");
         submit_data();
     });
 
@@ -68,21 +88,21 @@ function processResponse(responseText, interval) {
 
     // bar crawl done
     if (jsonResponse["status"] == "ok") {
+        var fluid = document.getElementsByClassName("container-fluid")[0];
+        fluid.style.height = "inherit";
         $("#bcButton").hide();
         $("#subtitle").hide();
         $("input").hide();
         $("#route_details").show();
         initMap(jsonResponse["origin_coordinates"]);
         setMarkers(jsonResponse["route_coordinates"], jsonResponse["route_names"], jsonResponse["route_addresses"]);
-
         $("#index_search").css("margin-top","0");
     }
-    console.log(jsonResponse);
 
+    $("#title a").html("Barcrawl");
     $("#bcButton").html("Go!");
 
     if (jsonResponse["relinquish"] == "cities") {
-
         $("#bcButton").html("Skip");
     }
 }
@@ -107,7 +127,7 @@ function initMap(origin_coordinates) {
 function writeStops(names, addresses, index) {
     var li = document.createElement("li");                      // create <li>
     var title = document.createElement("h3");                   // create <h3>
-    var t = document.createTextNode(names[index]);                  // define h3 text
+    var t = document.createTextNode(names[index]);              // define h3 text
     var par = document.createElement("p");                      // create <p>
     var tp = document.createTextNode(addresses[index]);    // define p text
 

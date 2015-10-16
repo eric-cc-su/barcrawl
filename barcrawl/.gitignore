@@ -3,5 +3,7 @@
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
+googleServer.txt
 secret.txt
+yelpkey.txt
 env/
