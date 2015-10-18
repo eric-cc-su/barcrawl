@@ -26,7 +26,7 @@ secretFile.close()
 
 DEBUG = False
 
-ALLOWED_HOSTS = ['127.0.0.1','.elasticbeanstalk.com', '192.168.1.121']
+ALLOWED_HOSTS = ['127.0.0.1','.elasticbeanstalk.com', '.gobarcrawl.com']
 
 # Application definition
 
