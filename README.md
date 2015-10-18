@@ -2,18 +2,31 @@
 
 CS4800 Algorithms final project to provide an optimal bar crawl path from city to city. The objective is to implement a Traveling Salesman Problem approximation algorithm.
 
+This project has now been developed as a Django web application and deployed to [www.gobarcrawl.com](http://www.gobarcrawl.com/).
+
+![Barcrawl web app](barcrawl.gif)
+
 ## Technologies
 - Python 2
-- Google Maps Geocode API
 - Google Maps Directions API
+- Google Maps Geocode API
+- Google Maps Javascript API
 - Yelp Business API
 - Yelp Search API
 
-## Running the Program
+## Using the Web Application
+1. The user inputs their origin address
+2. The user inputs other cities to visit (optional)
+3. If the user does not input other cities to visit, the user inputs the number
+of bars in their origin city to visit
+4. Work is done by the Python program in the back-end
+5. User is given a map and an ordered list of bars to visit
+
+## Running the Python Program
 In terminal/command console:
 `python barcrawl.py`
 
-## Process
+## Process - Python Application
 1. The user inputs the origin city
 2. The origin city coordinates are looked up via Google Geocode API and saved in a list (AKA `locations`)
 3. The user inputs a list of cities to visit (AKA `cities`)
