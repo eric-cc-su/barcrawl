@@ -20,6 +20,7 @@ from crawl import views as cviews
 urlpatterns = [
     #url(r'^$', include('crawl.urls')),
     url(r'^$', cviews.index, name='index'),
+    url(r'^about/', cviews.about, name='about'),
     url(r'^start/$', cviews.start, name='start'),
     url(r'^cities/$', cviews.cities, name='cities'),
     url(r'^onecity/$', cviews.onecity, name='onecity'),
