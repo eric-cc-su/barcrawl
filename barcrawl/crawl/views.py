@@ -10,6 +10,9 @@ def index(request, context={}):
 
     return render(request, 'crawl/index.html', context)
 
+def about(request, context={}):
+    return render(request, 'crawl/about.html', context)
+
 #Get origin address
 def start(request):
     if request.POST:
