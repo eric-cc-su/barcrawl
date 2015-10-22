@@ -9,6 +9,14 @@ h1{
     }
 }
 
+#about_body {
+    font-weight: 300;
+}
+
+#about_body > h3 {
+    font-weight: 300;
+}
+
 .btn-primary {
     margin-top: 20px;
     padding: 8px 40px;
