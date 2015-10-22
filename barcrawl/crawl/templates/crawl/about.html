@@ -8,8 +8,6 @@
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="{% static "js/bootstrap.min.js" %}"></script>
 
-    <script type="text/javascript" src="{% static 'js/index.js' %}"></script>
-
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBQyv2bn6zvJdSaergBDWzwva3XSZQUTUk">
     </script>
 
@@ -52,12 +50,23 @@
             <h2>How to Use</h2>
             <hr>
             <ol>
-                <li>Input your starting address (Your personal data is not saved and will disappear once your session ends)</li>
-                <li>Input the cities you want to travel to (will automatically give one bar per city)
+                <li>
+                    Input your starting address<br>
+                    (Your personal data is not saved and will disappear once your session ends)
+                    <img class="about_img img-responsive" src="https://i.gyazo.com/fcd91531b1fe1ed0504d8e4d20d03181.gif" alt="Barcrawl Origin Address"/>
+                </li>
+                <li>
+                    Input the cities you want to travel to<br>
+                    (will automatically give one bar per city)
+                    <img class="about_img img-responsive" src="https://i.gyazo.com/dac025ce76d94be7e10b55559a63c30a.png" alt="Barcrawl Cities"/>
                     <h3>OR</h3>
                     Leave the field blank, press "Skip", and input the number of bars in your city that you want to visit
+                    <img class="about_img img-responsive" src="https://i.gyazo.com/5278fa0c9a6ca0ce767db5d40486248a.gif" alt="Barcrawl local search"/>
                 </li>
-                <li>Get your bar crawl route</li>
+                <li>
+                    Get your bar crawl route
+                    <img class="about_img img-responsive" src="{% static 'images/barcrawl.gif' %}" alt="Barcrawl demo" />
+                </li>
             </ol>
             <h2>The Team</h2>
             <hr>
