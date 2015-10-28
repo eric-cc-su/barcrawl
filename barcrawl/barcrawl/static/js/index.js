@@ -113,21 +113,26 @@ function processResponse(responseText, interval) {
 //Initialize a map with the origin location
 var map;
 var directionsService;
-var directionsRender;
+
 function initMap(origin_coordinates) {
 
     map = new google.maps.Map(document.getElementById('map'), {
         center: origin_coordinates,
       });
     directionsService = new google.maps.DirectionsService();
-    directionsRender = new google.maps.DirectionsRenderer();
+    /*
+    directionsRender = new google.maps.DirectionsRenderer({
+
+        suppressMarkers: true
+    });
+    */
 
     var dimension = Math.min(500, window.innerWidth);
     if (dimension != 500) {
         $("#map").css("height", String(dimension*0.9));
         $("#map").css("width", String(dimension*0.9));
     }
-    directionsRender.setMap(map);
+    //directionsRender.setMap(map);
     $("#map").show();
 }
 
@@ -136,23 +141,28 @@ function writeStops(names, addresses, index) {
     var title = document.createElement("h3");                   // create <h3>
     var t = document.createTextNode(names[index]);              // define h3 text
     var par = document.createElement("p");                      // create <p>
-    var tp = document.createTextNode(addresses[index]);    // define p text
+    var tp = document.createTextNode(addresses[index]);         // define p text
+    var route_list = document.getElementById("route_details_ul");
 
     title.appendChild(t);
     par.appendChild(tp);
     li.appendChild(title);
     li.appendChild(par);
-    document.getElementById("route_details_ol").appendChild(li);
+    route_list.appendChild(li);
+    route_list.appendChild(document.createElement("hr"));
 }
 
 // Defines and sets the markers
 function setMarkers(route, names, addresses) {
     var bounds = new google.maps.LatLngBounds();
+    document.getElementById("route_details_ul").appendChild(
+        document.createElement("hr"));
     for (i=0; i < route.length; i++) {
         var marker = new google.maps.Marker({
+            clickable: true,
             position: route[i],
             map: map,
-            label: String(i),
+            label: String.fromCharCode(65+i),
             title: names[i]
         });
 
@@ -176,6 +186,15 @@ function createLatLng(route) {
     return LatLng;
 }
 
+// Render route to map
+function renderDirections(results) {
+    var renderer = new google.maps.DirectionsRenderer({
+            suppressMarkers: true
+        });
+    renderer.setMap(map);
+    renderer.setDirections(results);
+}
+
 // Send requests to Google Maps Directions service to draw route on map
 function mapDirections(route) {
     var waypts = [];
@@ -187,6 +206,7 @@ function mapDirections(route) {
     var tracking = 0;
     for (var i = 0; i < Math.ceil(route.length / 8); i++) {
         //Slice route into size-8 lists (due to GMaps constraints on waypoints)
+        waypts = [];
         var sliced = route.slice(tracking, ((i+1) * 8));
 
         //construct waypoints
@@ -212,15 +232,16 @@ function mapDirections(route) {
 
         //execute request
         directionsService.route(request, function (result, status) {
+            console.log(result);
             if (status == google.maps.DirectionsStatus.OK) {
-                directionsRender.setDirections(result);
+                renderDirections(result);
             }
             else {
                 console.log(status);
             }
         });
         //update the tracking integer
-        tracking = ((i+1) * 8);
+        tracking = ((i+1) * 8) - 1;
     }
 }
 
