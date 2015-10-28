@@ -2,6 +2,7 @@
  * Created by eric on 10/6/15.
  */
 
+// Calculate and adjust elements according to the screen size
 function calculate_numbers() {
     var screenheight = window.innerHeight;   //measures the height of the user's screen
 
@@ -12,6 +13,7 @@ function calculate_numbers() {
     fluid.style.height = (screenheight - footerHeight) + "px";
 }
 
+// Perform AJAX requests
 function submit_data() {
     var xhr = new XMLHttpRequest();
     var action = $("#bcform").attr("action");
@@ -43,30 +45,7 @@ function submit_data() {
     };
 }
 
-var main = function() {
-    calculate_numbers();
-
-    window.onresize = function() {
-        if (window.innerWidth > 768 && $("#map").css("display") == "none") {
-            calculate_numbers();
-        }
-    };
-
-    $("#bcform").on('submit', function(event) {
-        event.preventDefault();
-        submit_data();
-    });
-
-    $("input[name='cities']").on("input", function() {
-        if (this.value != '' && $("#bcButton").html() != "Go!") {
-            $("#bcButton").html("Go!");
-        }
-        else if (this.value == '' && $("#bcButton").html() == "Go!") {
-            $("#bcButton").html("Skip");
-        }
-    })
-};
-
+// process response from AJAX requests
 function processResponse(responseText, interval) {
     var jsonResponse = JSON.parse(responseText);
     var relinquish = jsonResponse["relinquish"];
@@ -109,33 +88,26 @@ function processResponse(responseText, interval) {
     }
 }
 
-
-//Initialize a map with the origin location
 var map;
 var directionsService;
 
+// Initialize a map with the origin location
 function initMap(origin_coordinates) {
-
     map = new google.maps.Map(document.getElementById('map'), {
         center: origin_coordinates,
       });
     directionsService = new google.maps.DirectionsService();
-    /*
-    directionsRender = new google.maps.DirectionsRenderer({
-
-        suppressMarkers: true
-    });
-    */
 
     var dimension = Math.min(500, window.innerWidth);
     if (dimension != 500) {
         $("#map").css("height", String(dimension*0.9));
         $("#map").css("width", String(dimension*0.9));
     }
-    //directionsRender.setMap(map);
+
     $("#map").show();
 }
 
+// Write each route stop to page
 function writeStops(names, addresses, index) {
     var li = document.createElement("li");                      // create <li>
     var title = document.createElement("h3");                   // create <h3>
@@ -232,7 +204,6 @@ function mapDirections(route) {
 
         //execute request
         directionsService.route(request, function (result, status) {
-            console.log(result);
             if (status == google.maps.DirectionsStatus.OK) {
                 renderDirections(result);
             }
@@ -244,5 +215,29 @@ function mapDirections(route) {
         tracking = ((i+1) * 8) - 1;
     }
 }
+
+var main = function() {
+    calculate_numbers();
+
+    window.onresize = function() {
+        if (window.innerWidth > 768 && $("#map").css("display") == "none") {
+            calculate_numbers();
+        }
+    };
+
+    $("#bcform").on('submit', function(event) {
+        event.preventDefault();
+        submit_data();
+    });
+
+    $("input[name='cities']").on("input", function() {
+        if (this.value != '' && $("#bcButton").html() != "Go!") {
+            $("#bcButton").html("Go!");
+        }
+        else if (this.value == '' && $("#bcButton").html() == "Go!") {
+            $("#bcButton").html("Skip");
+        }
+    })
+};
 
 $(document).ready(main);
