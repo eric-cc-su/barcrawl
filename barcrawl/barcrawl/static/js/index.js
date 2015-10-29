@@ -2,6 +2,7 @@
  * Created by eric on 10/6/15.
  */
 
+// Calculate and adjust elements according to the screen size
 function calculate_numbers() {
     var screenheight = window.innerHeight;   //measures the height of the user's screen
 
@@ -12,6 +13,7 @@ function calculate_numbers() {
     fluid.style.height = (screenheight - footerHeight) + "px";
 }
 
+// Perform AJAX requests
 function submit_data() {
     var xhr = new XMLHttpRequest();
     var action = $("#bcform").attr("action");
@@ -43,30 +45,7 @@ function submit_data() {
     };
 }
 
-var main = function() {
-    calculate_numbers();
-
-    window.onresize = function() {
-        if (window.innerWidth > 768 && $("#map").css("display") == "none") {
-            calculate_numbers();
-        }
-    };
-
-    $("#bcform").on('submit', function(event) {
-        event.preventDefault();
-        submit_data();
-    });
-
-    $("input[name='cities']").on("input", function() {
-        if (this.value != '' && $("#bcButton").html() != "Go!") {
-            $("#bcButton").html("Go!");
-        }
-        else if (this.value == '' && $("#bcButton").html() == "Go!") {
-            $("#bcButton").html("Skip");
-        }
-    })
-};
-
+// process response from AJAX requests
 function processResponse(responseText, interval) {
     var jsonResponse = JSON.parse(responseText);
     var relinquish = jsonResponse["relinquish"];
@@ -95,7 +74,9 @@ function processResponse(responseText, interval) {
         $("input").hide();
         $("#route_details").show();
         initMap(jsonResponse["origin_coordinates"]);
+        mapDirections(createLatLng(jsonResponse["route_coordinates"]));
         setMarkers(jsonResponse["route_coordinates"], jsonResponse["route_names"], jsonResponse["route_addresses"]);
+
         $("#index_search").css("margin-top","0");
     }
 
@@ -107,49 +88,57 @@ function processResponse(responseText, interval) {
     }
 }
 
-
-//Initialize a map with the origin location
 var map;
-function initMap(origin_coordinates) {
+var directionsService;
 
+// Initialize a map with the origin location
+function initMap(origin_coordinates) {
     map = new google.maps.Map(document.getElementById('map'), {
         center: origin_coordinates,
       });
+    directionsService = new google.maps.DirectionsService();
 
     var dimension = Math.min(500, window.innerWidth);
     if (dimension != 500) {
         $("#map").css("height", String(dimension*0.9));
         $("#map").css("width", String(dimension*0.9));
     }
+
     $("#map").show();
 }
 
+// Write each route stop to page
 function writeStops(names, addresses, index) {
     var li = document.createElement("li");                      // create <li>
     var title = document.createElement("h3");                   // create <h3>
     var t = document.createTextNode(names[index]);              // define h3 text
     var par = document.createElement("p");                      // create <p>
-    var tp = document.createTextNode(addresses[index]);    // define p text
+    var tp = document.createTextNode(addresses[index]);         // define p text
+    var route_list = document.getElementById("route_details_ul");
 
     title.appendChild(t);
     par.appendChild(tp);
     li.appendChild(title);
     li.appendChild(par);
-    document.getElementById("route_details_ol").appendChild(li);
+    route_list.appendChild(li);
+    route_list.appendChild(document.createElement("hr"));
 }
 
+// Defines and sets the markers
 function setMarkers(route, names, addresses) {
     var bounds = new google.maps.LatLngBounds();
-    var coordinates = route;
-    for (i=0; i < coordinates.length; i++) {
+    document.getElementById("route_details_ul").appendChild(
+        document.createElement("hr"));
+    for (i=0; i < route.length; i++) {
         var marker = new google.maps.Marker({
-            position: coordinates[i],
+            clickable: true,
+            position: route[i],
             map: map,
-            label: String(i),
+            label: String.fromCharCode(65+i),
             title: names[i]
         });
 
-        var LatLng = new google.maps.LatLng(coordinates[i]["lat"], coordinates[i]["lng"]);
+        var LatLng = new google.maps.LatLng(route[i]["lat"], route[i]["lng"]);
         marker.setMap(map);
         bounds.extend(LatLng);
 
@@ -158,5 +147,97 @@ function setMarkers(route, names, addresses) {
     writeStops(names, addresses, 0); // Write origin at end
     map.fitBounds(bounds);
 }
+
+//Gets jsonResponse of route and converts to an array of LatLng objects
+function createLatLng(route) {
+    var LatLng = [];
+    for (var i = 0; i < route.length; i++) {
+        var lt = new google.maps.LatLng(route[i]["lat"], route[i]["lng"]);
+        LatLng.push(lt);
+    }
+    return LatLng;
+}
+
+// Render route to map
+function renderDirections(results) {
+    var renderer = new google.maps.DirectionsRenderer({
+            suppressMarkers: true
+        });
+    renderer.setMap(map);
+    renderer.setDirections(results);
+}
+
+// Send requests to Google Maps Directions service to draw route on map
+function mapDirections(route) {
+    var waypts = [];
+
+    //Add the origin to the end to finish loop
+    route.push(route[0]);
+
+    //number to track the route index we are at (needed if route length > 8)
+    var tracking = 0;
+    for (var i = 0; i < Math.ceil(route.length / 8); i++) {
+        //Slice route into size-8 lists (due to GMaps constraints on waypoints)
+        waypts = [];
+        var sliced = route.slice(tracking, ((i+1) * 8));
+
+        //construct waypoints
+        for (var j = tracking; j < ((i+1) * 8); j++) {
+            if (route[j]) {
+                waypts.push({
+                    location: route[j],
+                    stopover: true
+                });
+            }
+            else {
+                break;
+            }
+        }
+
+        //construct request
+        var request = {
+            origin: sliced[0],
+            destination: sliced[sliced.length - 1],
+            waypoints: waypts,
+            travelMode: google.maps.TravelMode.DRIVING
+        };
+
+        //execute request
+        directionsService.route(request, function (result, status) {
+            if (status == google.maps.DirectionsStatus.OK) {
+                renderDirections(result);
+            }
+            else {
+                console.log(status);
+            }
+        });
+        //update the tracking integer
+        tracking = ((i+1) * 8) - 1;
+    }
+}
+
+var main = function() {
+    calculate_numbers();
+
+    window.onresize = function() {
+        if (window.innerWidth > 768 && $("#map").css("display") == "none") {
+            calculate_numbers();
+        }
+    };
+
+    $("#bcform").on('submit', function(event) {
+        event.preventDefault();
+        submit_data();
+    });
+
+    $("input[name='cities']").on("input", function() {
+        if (this.value != '' && $("#bcButton").html() != "Go!") {
+            $("#bcButton").html("Go!");
+        }
+        else if (this.value == '' && $("#bcButton").html() == "Go!") {
+            $("#bcButton").html("Skip");
+        }
+    })
+};
 
 $(document).ready(main);
