@@ -22,13 +22,22 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 secret = os.path.join(BASE_DIR, "secret.txt")
 secretFile = open(secret)
 SECRET_KEY = secretFile.readline().strip()
-secretFile.close()
+
 
 DEBUG = False
 
 ALLOWED_HOSTS = ['127.0.0.1','.elasticbeanstalk.com', '.gobarcrawl.com']
 
-# Application definition
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'barcrawldb',
+        'USER': 'root',
+        'PASSWORD': secretFile.readline().strip(),
+        'HOST': '127.0.0.1'
+    }
+}
+secretFile.close()
 
 INSTALLED_APPS = (
     'django.contrib.admin',

@@ -2,11 +2,15 @@
 # Input:   Cities to visit
 # Output:  Route to the highest rated bar in each city
 
+import datetime
 import json, requests # for making request to Google Maps
 import os
 import urllib2, sys, time
 import yelp
 import tsp_solver
+
+from crawl.models import City, Bar, Distance
+
 
 #SEARCH_LIMIT = 1
 
@@ -58,6 +62,17 @@ def main(cities, origin_address, origin_coordinates, search_limit=1):
        try:
            response = yelp.query_api('bars', city, SEARCH_LIMIT)
            for item in response:
+               # City does not exist in database
+               cityString = item.get('location').get('city').lower()
+               stateString = item.get('location').get('state_code')
+               countryString = item.get('location').get('country_code')
+               if not City.objects.get(city=cityString,
+                                       state=stateString,
+                                       country=countryString):
+                   City(city=cityString,
+                        state=stateString,
+                        country=countryString).save()
+
                locations.append(str(item.get('location').get('coordinate').get('latitude')) + ',' +
                                 str(item.get('location').get('coordinate').get('longitude')))
                # Save restaurant name and address

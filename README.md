@@ -13,6 +13,9 @@ This project has now been developed as a Django web application and deployed to 
 - Google Maps Javascript API
 - Yelp Business API
 - Yelp Search API
+- Django
+- MySQL
+- Bootstrap
 
 ## Using the Web Application
 1. The user inputs their origin address
