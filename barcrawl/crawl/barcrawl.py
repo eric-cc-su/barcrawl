@@ -59,33 +59,72 @@ def main(cities, origin_address, origin_coordinates, search_limit=1):
     counter = 0
     # Get list of top restaurants in each city
     for city in cities:
-       try:
-           response = yelp.query_api('bars', city, SEARCH_LIMIT)
-           for item in response:
-               # City does not exist in database
-               cityString = item.get('location').get('city').lower()
-               stateString = item.get('location').get('state_code')
-               countryString = item.get('location').get('country_code')
-               if not City.objects.get(city=cityString,
-                                       state=stateString,
-                                       country=countryString):
-                   City(city=cityString,
-                        state=stateString,
-                        country=countryString).save()
+        originCity = City.objects.get(city=city.lower())
 
-               locations.append(str(item.get('location').get('coordinate').get('latitude')) + ',' +
-                                str(item.get('location').get('coordinate').get('longitude')))
-               # Save restaurant name and address
-               prettyName = ""
-               if len(item.get('location').get('display_address')) > 0:
-                   prettyName += item.get('location').get('display_address')[0]
-               if len(item.get('location').get('display_address')) > 1:
-                   prettyName += ", "+item.get('location').get('display_address')[1]
-               if len(item.get('location').get('display_address')) > 2:
-                   prettyName += ", "+item.get('location').get('display_address')[2]
-               prettyLocations.append([item.get('name'),prettyName])
-       except urllib2.HTTPError as error:
-           sys.exit('Encountered HTTP error {0}. Abort program.'.format(error.code))
+        # Calculate last update of city info
+        datedelta = (datetime.date.today() - originCity.date).days
+
+        # City exists in database and is up to date
+        # and is associated with enough bars
+        if originCity and datedelta < 31 \
+                and Bar.objects.filter(city=originCity).count() >= search_limit:
+
+            # SELECT * FROM crawl_bar
+            # WHERE city_id = originCity
+            # ORDER BY order ASC
+            # LIMIT search_limit
+            bars = Bar.objects.filter(city=originCity).order_by('priority')[:search_limit]
+
+            for item in bars:
+                locations.append(str(item.lat)+','+str(item.lng))
+                prettyLocations.append([item.name,item.address])
+
+        else:
+            try:
+                response = yelp.query_api('bars', city, SEARCH_LIMIT)
+
+                for index, item in response:
+                    locationInfo = item.get('location')
+                    locationCoordinates = locationInfo.get('coordinate')
+                    displayAddress = locationInfo.get('display_address')
+
+                    # City does not exist in database
+                    if not originCity:
+                        cityString = locationInfo.get('city').lower()
+                        stateString = locationInfo.get('state_code')
+                        countryString = locationInfo.get('country_code')
+
+                        originCity = City(city=cityString,
+                                          state=stateString,
+                                          country=countryString)
+                    else:
+                        originCity.date = datetime.date.today()
+                    originCity.save()
+
+                    locations.append(str(locationCoordinates.get('latitude')) +
+                                     ',' +
+                                     str(locationCoordinates.get('longitude')))
+
+                    # Save restaurant name and address
+                    prettyName = ""
+                    if len(displayAddress) > 0:
+                        prettyName += displayAddress[0]
+                    if len(displayAddress) > 1:
+                        prettyName += ", "+displayAddress[1]
+                    if len(displayAddress) > 2:
+                        prettyName += ", "+displayAddress[2]
+                    prettyLocations.append([item.get('name'),prettyName])
+
+                    # Create bar entry in database
+                    Bar(city=originCity,
+                        name=item.get('name'),
+                        address=prettyName,
+                        lat=locationCoordinates.get('latitude'),
+                        lng=locationCoordinates.get('longitude'),
+                        priority=index).save()
+
+            except urllib2.HTTPError as error:
+                sys.exit('Encountered HTTP error {0}. Abort program.'.format(error.code))
 
     # ------
     # STEP 2 - Get distances between each restaurant

@@ -117,7 +117,6 @@ def get_business(business_id):
 
     return request(API_HOST, business_path)
 
-#def query_api(term, location):
 def query_api(term, location, search_limit):
     """Queries the API by the input values from the user.
     Args:
@@ -136,22 +135,14 @@ def query_api(term, location, search_limit):
     for i in range(search_limit):
         business_id = businesses[i]['id']
 
-        """
-        print (u'Querying business info for the top result "{1}" ...'.format(
-            len(businesses),
-            business_id
-        ))
-        """
         sys.stdout.write("\rGetting Bars...%d%%" % int((float(i)/search_limit) * 100))
         sys.stdout.flush()
 
         response = get_business(business_id)
 
-        #print (u'Result for business "{0}" found:'.format(business_id))
-        business_details.append(response)
+        #manually enumerating search results
+        business_details.append((i+1, response))
 
-    #pprint.pprint(response, indent=2)
-    #return response
     return business_details
 
 

@@ -10,9 +10,10 @@ class City(models.Model):
 class Bar(models.Model):
     city = models.ForeignKey('City')
     name = models.CharField(max_length=200)
-    address = models.CharField(max_length=200)
+    address = models.CharField(max_length=400)
     lat = models.FloatField(default=0.0)
     lng = models.FloatField(default=0.0)
+    priority = models.IntegerField(default=0)
 
 class Distance(models.Model):
     start = models.ForeignKey('City', related_name="start")
