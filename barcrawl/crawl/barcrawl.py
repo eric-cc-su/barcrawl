@@ -36,10 +36,15 @@ def get_origin(oAddress):
         if "locality" in item["types"]:
             city = item["long_name"]
     try:
-        returnDict = {"coordinates": '{},{}'.format(str(lat),str(lng)), "city": city}
+        returnDict = {"coordinates": '{},{}'.format(str(lat),str(lng)),
+                      "city": city}
     except:
         return False
     return(returnDict)
+
+# Removes any bars from database with priority 0
+def bar_cleanup():
+    Bar.objects.filter(priority=0).delete()
 
 # ------
 # STEP 1 - Get top restaurants
@@ -59,21 +64,34 @@ def main(cities, origin_address, origin_coordinates, search_limit=1):
     counter = 0
     # Get list of top restaurants in each city
     for city in cities:
-        originCity = City.objects.get(city=city.lower())
+        createCity = False
+
+        # Handle naming exception for New York City
+        if (city.lower().strip() == "new york city"):
+            city = "new york"
+
+        # SELECT * FROM crawl_city WHERE city = city.lower()
+        try:
+            originCity = City.objects.get(city=city.lower().strip())
+
+        except City.DoesNotExist:
+            originCity = City(city=city.lower())
+            originCity.save()
+            createCity = True
 
         # Calculate last update of city info
         datedelta = (datetime.date.today() - originCity.date).days
 
         # City exists in database and is up to date
         # and is associated with enough bars
-        if originCity and datedelta < 31 \
-                and Bar.objects.filter(city=originCity).count() >= search_limit:
-
+        if datedelta < 31 \
+        and Bar.objects.filter(city=originCity).count() >= search_limit:
             # SELECT * FROM crawl_bar
             # WHERE city_id = originCity
-            # ORDER BY order ASC
+            # ORDER BY priority ASC
             # LIMIT search_limit
-            bars = Bar.objects.filter(city=originCity).order_by('priority')[:search_limit]
+            bars = (Bar.objects.filter(city=originCity)
+                        .order_by('priority')[:search_limit])
 
             for item in bars:
                 locations.append(str(item.lat)+','+str(item.lng))
@@ -81,6 +99,7 @@ def main(cities, origin_address, origin_coordinates, search_limit=1):
 
         else:
             try:
+                print("request bar: {!s}".format(city))
                 response = yelp.query_api('bars', city, SEARCH_LIMIT)
 
                 for index, item in response:
@@ -89,23 +108,23 @@ def main(cities, origin_address, origin_coordinates, search_limit=1):
                     displayAddress = locationInfo.get('display_address')
 
                     # City does not exist in database
-                    if not originCity:
+                    if createCity:
                         cityString = locationInfo.get('city').lower()
                         stateString = locationInfo.get('state_code')
                         countryString = locationInfo.get('country_code')
 
-                        originCity = City(city=cityString,
-                                          state=stateString,
-                                          country=countryString)
-                    else:
-                        originCity.date = datetime.date.today()
+                        originCity.city = cityString
+                        originCity.state = stateString
+                        originCity.country = countryString
+                        createCity = False
+
                     originCity.save()
 
                     locations.append(str(locationCoordinates.get('latitude')) +
                                      ',' +
                                      str(locationCoordinates.get('longitude')))
 
-                    # Save restaurant name and address
+                    # construct bar address
                     prettyName = ""
                     if len(displayAddress) > 0:
                         prettyName += displayAddress[0]
@@ -115,16 +134,47 @@ def main(cities, origin_address, origin_coordinates, search_limit=1):
                         prettyName += ", "+displayAddress[2]
                     prettyLocations.append([item.get('name'),prettyName])
 
+                    # Check if the bar exists in the database
+                    try:
+                        attemptBar = Bar.objects.get(city=originCity,
+                                     name=item.get('name'),
+                                     address=prettyName,
+                                     lat=locationCoordinates.get('latitude'),
+                                     lng=locationCoordinates.get('longitude'))
+
+                        # Update bar's priority if needed
+                        if (attemptBar.priority != index):
+                            attemptBar.priority = index
+                            attemptBar.save()
+
+                    # Bar does not exist in database
                     # Create bar entry in database
-                    Bar(city=originCity,
-                        name=item.get('name'),
-                        address=prettyName,
-                        lat=locationCoordinates.get('latitude'),
-                        lng=locationCoordinates.get('longitude'),
-                        priority=index).save()
+                    except Bar.DoesNotExist:
+                        # Get bars that currently hold the priority placement
+                        conflictBars = (Bar.objects.filter(city=originCity,
+                                                          priority=index)
+                                .exclude(name=item.get('name'),
+                                  address=prettyName,
+                                  lat=locationCoordinates.get('latitude'),
+                                  lng=locationCoordinates.get('longitude'),))
+                        # Update conflicting bars to priority 0
+                        for bar in conflictBars:
+                            bar.priority=0
+                            bar.save()
+
+                        # Create new bar object and save
+                        Bar(city=originCity,
+                            name=item.get('name'),
+                            address=prettyName,
+                            lat=locationCoordinates.get('latitude'),
+                            lng=locationCoordinates.get('longitude'),
+                            priority=index).save()
 
             except urllib2.HTTPError as error:
-                sys.exit('Encountered HTTP error {0}. Abort program.'.format(error.code))
+                sys.exit('Encountered HTTP error {0}. Abort program.'
+                         .format(error.code))
+    # Remove bars with priority 0 from database
+    bar_cleanup()
 
     # ------
     # STEP 2 - Get distances between each restaurant
@@ -163,14 +213,22 @@ def main(cities, origin_address, origin_coordinates, search_limit=1):
                data = json.loads(resp.text)
                if (data.get('status') == 'ZERO_RESULTS'):
                    return {"status": 500,
-                           "message": "Directions not found from " + prettyLocations[i][1]
-                                         + " to " + prettyLocations[j][1]}
+                           "message": "Directions not found from "+
+                                      prettyLocations[i][1]+
+                                      " to " + prettyLocations[j][1]}
                else:
                    # Storing distances in matrix for tsp_solver
-                   distances_matrix[i][j] = data.get('routes')[0].get('legs')[0].get('distance').get('value')
-                   distances_matrix[j][i] = data.get('routes')[0].get('legs')[0].get('distance').get('value')
+                   distances_matrix[i][j] = (data.get('routes')[0]
+                                                .get('legs')[0]
+                                                .get('distance')
+                                                .get('value'))
+                   distances_matrix[j][i] = (data.get('routes')[0]
+                                                .get('legs')[0]
+                                                .get('distance')
+                                                .get('value'))
                    counter += 1
-                   sys.stdout.write("\rGetting Distances...%d%%" % int((float(counter)/lookupNum) * 100))
+                   sys.stdout.write("\rGetting Distances...%d%%" %
+                                    int((float(counter)/lookupNum) * 100))
                    sys.stdout.flush()
 
     # ------
@@ -189,8 +247,10 @@ def main(cities, origin_address, origin_coordinates, search_limit=1):
     route_distance += distances_matrix[cities_index[-1]][0]
 
     print('\nDone!')
-    route_dict = {"origin_coordinates":{"lat": float(origin_coordinates.split(",")[0]),
-                                        "lng": float(origin_coordinates.split(",")[1])},
+    route_dict = {"origin_coordinates":{"lat": float(origin_coordinates
+                                                     .split(",")[0]),
+                                        "lng": float(origin_coordinates
+                                                     .split(",")[1])},
                   "route_coordinates":[],
                   "route_names":[],
                   "route_addresses":[],
