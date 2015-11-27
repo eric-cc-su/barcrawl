@@ -67,7 +67,8 @@ def cities(request):
 
             return HttpResponse(json.dumps(route),
                                 content_type="application/json",
-                                status=status)
+                                status=status,
+                                reason=route["status_text"])
 
 #Bar Crawl within one city
 def onecity(request):
@@ -83,4 +84,5 @@ def onecity(request):
 
         return HttpResponse(json.dumps(route),
                             content_type="application/json",
-                            status=status)
+                            status=status,
+                            reason=route["status_text"])

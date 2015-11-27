@@ -16,6 +16,6 @@ class Bar(models.Model):
     priority = models.IntegerField(default=0)
 
 class Distance(models.Model):
-    start = models.ForeignKey('City', related_name="start")
-    end = models.ForeignKey('City', related_name="end")
+    start = models.ForeignKey('Bar', related_name="start")
+    end = models.ForeignKey('Bar', related_name="end")
     distance = models.PositiveIntegerField()

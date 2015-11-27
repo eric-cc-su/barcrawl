@@ -37,8 +37,10 @@ function submit_data() {
                 processResponse(xhr.responseText, interval);
             }
             else if (xhr.status == 500) {
-                alert("Sorry! This is an internal server error 500. Please try different inputs and report " +
-                    "the issue to github.com/eric-cc-su/barcrawl");
+                alert("Sorry! Please report the following to "+
+                    "github.com/eric-cc-su/barcrawl/issues:\n"+
+                    "Internal server error 500:\n" +
+                    xhr.statusText);
                 window.location.reload();
             }
         }
