@@ -9,6 +9,7 @@ import urllib2, sys, time
 import yelp
 import tsp_solver
 
+from django.db.models import Q
 from crawl.models import City, Bar, Distance
 
 def get_server_key():
@@ -41,7 +42,13 @@ def get_origin(oAddress):
 
 # Removes any bars from database with priority 0
 def bar_cleanup():
-    Bar.objects.filter(priority=0).delete()
+    cleanup = Bar.objects.filter(priority=0)
+
+    # Remove distance entries referring to Bar
+    for bar in cleanup:
+        Distance.objects.filter(Q(start=bar) | Q(end=bar)).delete()
+
+    cleanup.delete()
 
 # Get bars in each city
 def get_bars(cities, locations, prettyLocations, search_limit):
@@ -137,10 +144,10 @@ def get_bars(cities, locations, prettyLocations, search_limit):
                         # Get bars that currently hold the priority placement
                         conflictBars = (Bar.objects.filter(city=originCity,
                                                           priority=index)
-                                .exclude(name=item.get('name'),
-                                  address=prettyName,
-                                  lat=locationCoordinates.get('latitude'),
-                                  lng=locationCoordinates.get('longitude'),))
+                                .exclude(Q(name=item.get('name')) |
+                                  Q(address=prettyName) |
+                                  Q(lat=locationCoordinates.get('latitude')) |
+                                  Q(lng=locationCoordinates.get('longitude'))))
                         # Update conflicting bars to priority 0
                         for bar in conflictBars:
                             bar.priority=0
