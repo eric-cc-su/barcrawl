@@ -10,6 +10,7 @@ import yelp
 import tsp_solver
 
 from django.db.models import Q
+from django.http import HttpResponse
 from crawl.models import City, Bar, Distance
 
 def get_server_key():
@@ -110,7 +111,7 @@ def get_bars(cities, locations, prettyLocations, search_limit):
 
                     # Mark city as up-to-date
                     if datedelta >= 31:
-                        originCity.date = datetime.today()
+                        originCity.date = datetime.date.today()
                         originCity.save()
 
                     originCity.save()
@@ -293,7 +294,9 @@ def main(cities, origin_address, origin_coordinates, search_limit=1):
         # Generate list of locations to visit in order
         distances_matrix = get_distances(locations, prettyLocations)
     except Exception as e:
-        returnedException = e
+        print(e)
+        return HttpResponse(e, status=500, reason=e)
+        #returnedException = e
     # ------
     # STEP 3 - Algorithm to find shortest path
     # ------
