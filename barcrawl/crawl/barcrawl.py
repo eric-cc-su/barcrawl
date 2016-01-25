@@ -4,6 +4,7 @@
 
 import datetime
 import json, requests # for making request to Google Maps
+import logging
 import os
 import urllib2, sys, time
 import yelp
@@ -274,6 +275,7 @@ def get_distances(locations, prettyLocations):
 # STEP 1 - Get top restaurants
 # ------
 def main(cities, origin_address, origin_coordinates, search_limit=1):
+    logger = logging.getLogger('barcrawl')
     # coordinates of locations
     locations = []
     # User-friendly Addresses
@@ -287,16 +289,15 @@ def main(cities, origin_address, origin_coordinates, search_limit=1):
     try:
         get_bars(cities, locations, prettyLocations, search_limit)
 
-
         # ------
         # STEP 2 - Get distances between each restaurant
         # ------
         # Generate list of locations to visit in order
         distances_matrix = get_distances(locations, prettyLocations)
     except Exception as e:
-        print(e)
+        logger.exception(e)
         return HttpResponse(e, status=500, reason=e)
-        #returnedException = e
+
     # ------
     # STEP 3 - Algorithm to find shortest path
     # ------

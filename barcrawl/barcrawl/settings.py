@@ -49,6 +49,40 @@ INSTALLED_APPS = (
     'crawl'
 )
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'django_file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'log/django.log',
+        },
+        'barcrawl_file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'log/barcrawl.log',
+        }
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['django_file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'django.request': {
+            'handlers': ['django_file'],
+            'level': 'INFO',
+            'propogate': False,
+        },
+        'barcrawl': {
+            'handlers': ['barcrawl_file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        }
+    },
+}
+
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
