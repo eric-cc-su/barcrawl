@@ -2,4 +2,4 @@
 *.pyc
 keys.txt
 .idea/
-barcrawl/crawl/migrations/
+barcrawl/log/
